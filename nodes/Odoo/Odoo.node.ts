@@ -13,6 +13,9 @@ import {
 	NodeCredentialTestResult,
 } from 'n8n-workflow';
 import { OptionsWithUri } from 'request';
+import { contactDescription } from './descriptions/ContactDescription';
+import { noteDescription } from './descriptions/NoteDescription';
+import { opportunityDescription } from './descriptions/OpportunityDescription';
 
 import {
 	IOdooFilterOperations,
@@ -23,14 +26,8 @@ import {
 	odooGetModelFields,
 	odooGetUserID,
 	odooUpdate,
+	processNameValueFields,
 } from './GenericFunctions';
-import {
-	calendarEventDescription,
-	crmLeadDescription,
-	noteNoteDescription,
-	resPartnerDescription,
-	stockPickingTypeDescription,
-} from './models/OdooModelsDescription';
 
 export class Odoo implements INodeType {
 	description: INodeTypeDescription = {
@@ -59,32 +56,25 @@ export class Odoo implements INodeType {
 				displayName: 'Resource',
 				name: 'resource',
 				type: 'options',
-				default: 'res.partner',
+				default: 'contact',
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Calendar',
-						value: 'calendar.event',
-					},
-					{
 						name: 'Contact',
-						value: 'res.partner',
+						value: 'contact',
 					},
 					{
-						name: 'Crm',
-						value: 'crm.lead',
+						name: 'Opportunity',
+						value: 'opportunity',
 					},
 					{
 						name: 'Custom Resource',
 						value: 'custom',
-					},
-					{
-						name: 'Inventory',
-						value: 'stock.picking.type',
+						description: 'Only for advanced users! Use cautiously!',
 					},
 					{
 						name: 'Note',
-						value: 'note.note',
+						value: 'note',
 					},
 				],
 				description: 'The resource to operate on',
@@ -220,15 +210,13 @@ export class Odoo implements INodeType {
 					},
 				],
 			},
-			...noteNoteDescription,
-			...resPartnerDescription,
-			...calendarEventDescription,
-			...crmLeadDescription,
-			...stockPickingTypeDescription,
-			//======================================================================
+
+			//    Descriptions   --------------------------------------------------
+			...opportunityDescription,
+			...contactDescription,
+			...noteDescription,
 
 			//    Get All   ------------------------------------------------------
-
 			{
 				displayName: 'Filter Results',
 				name: 'filterRequest',
@@ -243,6 +231,7 @@ export class Odoo implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['getAll'],
+						resource: ['custom'],
 					},
 				},
 				options: [
@@ -322,7 +311,6 @@ export class Odoo implements INodeType {
 			},
 
 			//    Update/Create    -----------------------------------------------
-
 			{
 				displayName: 'AddFields',
 				name: 'fieldsToCreateOrUpdate',
@@ -337,6 +325,7 @@ export class Odoo implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['update', 'create'],
+						resource: ['custom'],
 					},
 				},
 				options: [
@@ -347,16 +336,18 @@ export class Odoo implements INodeType {
 							{
 								displayName: 'Field Name',
 								name: 'fieldName',
-								type: 'string',
+								type: 'options',
 								default: '',
-								required: true,
+								noDataExpression: true,
+								typeOptions: {
+									loadOptionsMethod: 'getModelFields',
+								},
 							},
 							{
 								displayName: 'New Value',
 								name: 'fieldValue',
 								type: 'string',
 								default: '',
-								required: true,
 							},
 						],
 					},
@@ -422,17 +413,16 @@ export class Odoo implements INodeType {
 						'User-Agent': 'https://n8n.io',
 						Connection: 'keep-alive',
 						Accept: '*/*',
-						'Accept-Encoding': 'gzip, deflate, br',
 						'Content-Type': 'application/json',
 					},
 					method: 'POST',
 					body,
-					uri: `${credentials?.url}/jsonrpc`,
+					uri: `${(credentials?.url as string).replace(/\/$/, '')}/jsonrpc`,
 					json: true,
 				};
-
 				try {
 					const result = await this.helpers.request!(options);
+					console.log(result);
 					if (result.error || !result.result) {
 						return {
 							status: 'Error',
@@ -464,14 +454,15 @@ export class Odoo implements INodeType {
 		const returnData: IDataObject[] = [];
 		let responseData;
 
-		let resource = this.getNodeParameter('resource', 0) as string;
+		const resource = this.getNodeParameter('resource', 0) as string;
+		let customResource = '';
 		if (resource === 'custom') {
-			resource = this.getNodeParameter('customResource', 0) as string;
+			customResource = this.getNodeParameter('customResource', 0) as string;
 		}
 		const operation = this.getNodeParameter('operation', 0) as string;
 
 		const credentials = await this.getCredentials('odooApi');
-		const url = credentials?.url as string;
+		const url = (credentials?.url as string).replace(/\/$/, '');
 		const username = credentials?.username as string;
 		const password = credentials?.password as string;
 		const db = (credentials?.db || url.split('//')[1].split('.')[0]) as string;
@@ -485,60 +476,117 @@ export class Odoo implements INodeType {
 			try {
 				//    Create    ------------------------------------------------------
 				if (operation === 'create') {
+					let fields: IDataObject = {};
+					if (resource === 'custom') {
+						fields =
+							(processNameValueFields(
+								this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject,
+							) as IDataObject) || {};
+					} else {
+						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+						fields = { ...additionalFields };
+					}
+
+					if (resource === 'opportunity') {
+						const opportunity = this.getNodeParameter('opportunity', i) as string;
+						fields['name'] = opportunity;
+					}
+
+					if (resource === 'contact') {
+						const contactName = this.getNodeParameter('contactName', i) as string;
+						fields['name'] = contactName;
+					}
+
 					responseData = await odooCreate.call(
 						this,
 						db,
 						userID,
 						password,
-						resource,
+						resource === 'custom' ? customResource : resource,
 						operation,
 						url,
-						this.getNodeParameter('fieldsToCreateOrUpdate', 0) as IDataObject,
+						fields,
 					);
 				}
 
 				//    Get       ------------------------------------------------------
 				if (operation === 'get') {
-					responseData = await odooGet.call(
-						this,
-						db,
-						userID,
-						password,
-						resource,
-						operation,
-						url,
-						this.getNodeParameter('items_id', 0) as string,
-						this.getNodeParameter('fieldsList', 0) as IDataObject,
-					);
+					if (resource === 'custom') {
+						responseData = await odooGet.call(
+							this,
+							db,
+							userID,
+							password,
+							customResource,
+							operation,
+							url,
+							this.getNodeParameter('items_id', i) as string,
+							this.getNodeParameter('fieldsList', i) as IDataObject,
+						);
+					} else {
+						responseData = await odooGet.call(
+							this,
+							db,
+							userID,
+							password,
+							resource,
+							operation,
+							url,
+							this.getNodeParameter('items_id', i) as string,
+						);
+					}
 				}
 
 				//    Get All   ------------------------------------------------------
 				if (operation === 'getAll') {
-					responseData = await odooGetAll.call(
-						this,
-						db,
-						userID,
-						password,
-						resource,
-						operation,
-						url,
-						this.getNodeParameter('filterRequest', 0) as IOdooFilterOperations,
-						this.getNodeParameter('fieldsList', 0) as IDataObject,
-					);
+					if (resource === 'custom') {
+						responseData = await odooGetAll.call(
+							this,
+							db,
+							userID,
+							password,
+							customResource,
+							operation,
+							url,
+							this.getNodeParameter('filterRequest', i) as IOdooFilterOperations,
+							this.getNodeParameter('fieldsList', i) as IDataObject,
+						);
+					} else {
+						responseData = await odooGetAll.call(
+							this,
+							db,
+							userID,
+							password,
+							resource,
+							operation,
+							url,
+						);
+					}
 				}
 
 				//    Update    ------------------------------------------------------
 				if (operation === 'update') {
+					let fields: IDataObject = {};
+					if (resource === 'custom') {
+						fields =
+							(processNameValueFields(
+								this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject,
+							) as IDataObject) || {};
+					} else {
+						const additionalFields = this.getNodeParameter('updateFields', i) as IDataObject;
+						fields = { ...additionalFields };
+					}
+
 					responseData = await odooUpdate.call(
 						this,
 						db,
 						userID,
 						password,
-						resource,
+						resource === 'custom' ? customResource : resource,
 						operation,
 						url,
-						this.getNodeParameter('items_id', 0) as string,
-						this.getNodeParameter('fieldsToCreateOrUpdate', 0) as IDataObject,
+						this.getNodeParameter('items_id', i) as string,
+						fields,
 					);
 				}
 
@@ -549,10 +597,10 @@ export class Odoo implements INodeType {
 						db,
 						userID,
 						password,
-						resource,
+						resource === 'custom' ? customResource : resource,
 						operation,
 						url,
-						this.getNodeParameter('items_id', 0) as string,
+						this.getNodeParameter('items_id', i) as string,
 					);
 				}
 

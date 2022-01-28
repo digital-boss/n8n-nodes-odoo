@@ -6,7 +6,7 @@
 
 Install it to the n8n root folder. This is the node_modules folder on the same level of n8n and n8n-core. This differs when you used the -g flag on n8n initial installation. From there do:
 ```
-npm install n8n-nodes-odoo
+npm install @digital-boss/n8n-nodes-odoo
 ```
 
 # IFresh install n8n
