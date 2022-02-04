@@ -75,18 +75,6 @@ export interface IOdooResponceFields {
 
 type OdooCRUD = 'create' | 'update' | 'delete' | 'get' | 'getAll';
 
-function sanitizeInput(value: string, toNumber = false) {
-	const result = value
-		.replace(/ /g, '')
-		.split(',')
-		.filter((item) => item);
-	if (toNumber) {
-		return result.map((id) => +id);
-	} else {
-		return result;
-	}
-}
-
 function processFilters(value: IOdooFilterOperations) {
 	return value.filter?.map((item) => {
 		const operator = item.operator as FilterOperation;
@@ -233,7 +221,7 @@ export async function odooGet(
 					password,
 					mapOdooResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
-					sanitizeInput(itemsID, true) || [],
+					[itemsID] || [],
 					(fieldsToReturn && processResponceFields(fieldsToReturn)) || [],
 				],
 			},
@@ -257,6 +245,8 @@ export async function odooGetAll(
 	url: string,
 	filters?: IOdooFilterOperations,
 	fieldsToReturn?: IDataObject,
+	offset = 0,
+	limit = 0,
 ) {
 	try {
 		const body = {
@@ -273,6 +263,8 @@ export async function odooGetAll(
 					mapOperationToJSONRPC[operation],
 					(filters && processFilters(filters)) || [],
 					(fieldsToReturn && processResponceFields(fieldsToReturn)) || [],
+					offset,
+					limit,
 				],
 			},
 			id: Math.floor(Math.random() * 100),
@@ -309,7 +301,7 @@ export async function odooUpdate(
 					password,
 					mapOdooResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
-					sanitizeInput(itemsID, true) || [],
+					[itemsID] || [],
 					fieldsToUpdate,
 				],
 			},
@@ -346,7 +338,7 @@ export async function odooDelete(
 					password,
 					mapOdooResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
-					sanitizeInput(itemsID, true) || [],
+					[itemsID] || [],
 				],
 			},
 			id: Math.floor(Math.random() * 100),
