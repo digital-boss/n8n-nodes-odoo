@@ -1,6 +1,6 @@
 {
     "name": "@digital-boss/n8n-nodes-odoo",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A node consuming the Google Chat API.",
     "license": "SEE LICENSE IN LICENSE.md",
     "homepage": "https://n8n.io",
