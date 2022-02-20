@@ -46,7 +46,7 @@
     },
     "dependencies": {
         "n8n-core": "~0.104.0",
-        "rhea": "^1.0.11"
+        "rhea": "^1.0.24"
     },
     "jest": {
         "transform": {
