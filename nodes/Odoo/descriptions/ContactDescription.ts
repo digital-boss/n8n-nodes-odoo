@@ -1,5 +1,6 @@
-import { INodeProperties } from 'n8n-workflow';
-import { options } from 'rhea';
+import {
+	INodeProperties,
+} from 'n8n-workflow';
 
 export const contactOperations: INodeProperties[] = [
 	{
@@ -10,7 +11,9 @@ export const contactOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: {
 			show: {
-				resource: ['contact'],
+				resource: [
+					'contact',
+				],
 			},
 		},
 		options: [
@@ -43,51 +46,6 @@ export const contactOperations: INodeProperties[] = [
 	},
 ];
 
-const contactFields: INodeProperties[] = [
-	{
-		displayName: 'Tax ID',
-		name: 'vat',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Job Position',
-		name: 'function',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Email',
-		name: 'email',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Website',
-		name: 'website',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Phone',
-		name: 'phone',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Mobile',
-		name: 'mobile',
-		type: 'string',
-		default: '',
-	},
-	{
-		displayName: 'Internal Notes',
-		name: 'comment',
-		type: 'string',
-		default: '',
-	},
-];
-
 export const contactDescription: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
 	/*                                contact:create                              */
@@ -100,13 +58,15 @@ export const contactDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['create'],
-				resource: ['contact'],
+				operation: [
+					'create',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
-		description: 'Enter contact name',
 	},
-
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
@@ -115,41 +75,29 @@ export const contactDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['create'],
-				resource: ['contact'],
+				operation: [
+					'create',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
 		options: [
 			{
 				displayName: 'Address',
 				name: 'address',
-				type: 'collection',
+				type: 'fixedCollection',
 				default: {},
-				description: 'Contact Address',
-				placeholder: 'Add Address Fields',
+				placeholder: 'Add Address',
 				typeOptions: {
 					multipleValues: false,
 				},
 				options: [
 					{
-						displayName: 'Fields',
-						name: 'fields',
-						type: 'collection',
-						default: {},
-						placeholder: 'Add Field',
-						options: [
-							{
-								displayName: 'Street',
-								name: 'street',
-								type: 'string',
-								default: '',
-							},
-							{
-								displayName: 'Street 2',
-								name: 'street2',
-								type: 'string',
-								default: '',
-							},
+						name: 'value',
+						displayName: 'Address',
+						values: [
 							{
 								displayName: 'City',
 								name: 'city',
@@ -175,6 +123,18 @@ export const contactDescription: INodeProperties[] = [
 								},
 							},
 							{
+								displayName: 'Street',
+								name: 'street',
+								type: 'string',
+								default: '',
+							},
+							{
+								displayName: 'Street 2',
+								name: 'street2',
+								type: 'string',
+								default: '',
+							},
+							{
 								displayName: 'Zip Code',
 								name: 'zip',
 								type: 'string',
@@ -184,7 +144,48 @@ export const contactDescription: INodeProperties[] = [
 					},
 				],
 			},
-			...contactFields,
+			{
+				displayName: 'Email',
+				name: 'email',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Internal Notes',
+				name: 'comment',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Job Position',
+				name: 'function',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Mobile',
+				name: 'mobile',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Phone',
+				name: 'phone',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Tax ID',
+				name: 'vat',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Website',
+				name: 'website',
+				type: 'string',
+				default: '',
+			},
 		],
 	},
 
@@ -199,8 +200,13 @@ export const contactDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['get', 'delete'],
-				resource: ['contact'],
+				operation: [
+					'get',
+					'delete',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
 	},
@@ -215,8 +221,12 @@ export const contactDescription: INodeProperties[] = [
 		type: 'boolean',
 		displayOptions: {
 			show: {
-				resource: ['contact'],
-				operation: ['getAll'],
+				resource: [
+					'contact',
+				],
+				operation: [
+					'getAll',
+				],
 			},
 		},
 		default: false,
@@ -230,9 +240,15 @@ export const contactDescription: INodeProperties[] = [
 		default: 50,
 		displayOptions: {
 			show: {
-				resource: ['contact'],
-				operation: ['getAll'],
-				returnAll: [false],
+				resource: [
+					'contact',
+				],
+				operation: [
+					'getAll',
+				],
+				returnAll: [
+					false,
+				],
 			},
 		},
 		typeOptions: {
@@ -249,8 +265,13 @@ export const contactDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['getAll', 'get'],
-				resource: ['contact'],
+				operation: [
+					'getAll',
+					'get',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
 		options: [
@@ -277,8 +298,12 @@ export const contactDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['contact'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
 	},
@@ -290,41 +315,29 @@ export const contactDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['contact'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'contact',
+				],
 			},
 		},
 		options: [
 			{
 				displayName: 'Address',
 				name: 'address',
-				type: 'collection',
+				type: 'fixedCollection',
 				default: {},
-				description: 'Contact Address',
-				placeholder: 'Add Address Fields',
+				placeholder: 'Add Address',
 				typeOptions: {
 					multipleValues: false,
 				},
 				options: [
 					{
-						displayName: 'Fields',
-						name: 'fields',
-						type: 'collection',
-						default: {},
-						placeholder: 'Add Field',
-						options: [
-							{
-								displayName: 'Street',
-								name: 'street',
-								type: 'string',
-								default: '',
-							},
-							{
-								displayName: 'Street 2',
-								name: 'street2',
-								type: 'string',
-								default: '',
-							},
+						name: 'value',
+						displayName: 'Address',
+						values: [
 							{
 								displayName: 'City',
 								name: 'city',
@@ -350,6 +363,18 @@ export const contactDescription: INodeProperties[] = [
 								},
 							},
 							{
+								displayName: 'Street',
+								name: 'street',
+								type: 'string',
+								default: '',
+							},
+							{
+								displayName: 'Street 2',
+								name: 'street2',
+								type: 'string',
+								default: '',
+							},
+							{
 								displayName: 'Zip Code',
 								name: 'zip',
 								type: 'string',
@@ -360,12 +385,53 @@ export const contactDescription: INodeProperties[] = [
 				],
 			},
 			{
+				displayName: 'Email',
+				name: 'email',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Internal Notes',
+				name: 'comment',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Job Position',
+				name: 'function',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Mobile',
+				name: 'mobile',
+				type: 'string',
+				default: '',
+			},
+			{
 				displayName: 'Name',
 				name: 'name',
 				type: 'string',
 				default: '',
 			},
-			...contactFields,
+			{
+				displayName: 'Phone',
+				name: 'phone',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Tax ID',
+				name: 'vat',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Website',
+				name: 'website',
+				type: 'string',
+				default: '',
+			},
 		],
 	},
 ];

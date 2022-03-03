@@ -1,6 +1,24 @@
-import { INodeProperties } from 'n8n-workflow';
+import {
+	INodeProperties,
+} from 'n8n-workflow';
 
 export const customResourceOperations: INodeProperties[] = [
+	{
+		displayName: 'Custom Resource',
+		name: 'customResource',
+		type: 'options',
+		default: '',
+		typeOptions: {
+			loadOptionsMethod: 'getModels',
+		},
+		displayOptions: {
+			show: {
+				resource: [
+					'custom',
+				],
+			},
+		},
+	},
 	{
 		displayName: 'Operation',
 		name: 'operation',
@@ -9,7 +27,9 @@ export const customResourceOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: {
 			show: {
-				resource: ['custom'],
+				resource: [
+					'custom',
+				],
 			},
 		},
 		options: [
@@ -43,60 +63,11 @@ export const customResourceOperations: INodeProperties[] = [
 ];
 
 export const customResourceDescription: INodeProperties[] = [
-	// {
-	// 	displayName: 'Custom Resource',
-	// 	name: 'customResource',
-	// 	type: 'string',
-	// 	default: '',
-	// 	description: 'Specify custom resource',
-	// 	required: true,
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['custom'],
-	// 		},
-	// 	},
-	// },
-
-	{
-		displayName: 'Custom Resource',
-		name: 'customResource',
-		type: 'options',
-		default: '',
-		noDataExpression: true,
-		typeOptions: {
-			loadOptionsMethod: 'getModels',
-		},
-		displayOptions: {
-			show: {
-				resource: ['custom'],
-			},
-		},
-	},
-
 	/* -------------------------------------------------------------------------- */
-	/*                                custom:create                              */
+	/*                                custom:create                               */
 	/* -------------------------------------------------------------------------- */
-
-	// {
-	// 	displayName: 'Additional Fields',
-	// 	name: 'additionalFields',
-	// 	type: 'collection',
-	// 	default: {},
-	// 	placeholder: 'Add Field',
-	// 	displayOptions: {
-	// 		show: {
-	// 			operation: ['create'],
-	// 			resource: ['custom'],
-	// 		},
-	// 	},
-	// 	typeOptions: {
-	// 		loadOptionsDependsOn: ['/customResource'],
-	// 		loadOptionsMethod: 'getModelFields',
-	// 	},
-	// },
-
 	{
-		displayName: 'Additional Fields',
+		displayName: 'Fields',
 		name: 'fieldsToCreateOrUpdate',
 		type: 'fixedCollection',
 		typeOptions: {
@@ -107,8 +78,12 @@ export const customResourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['create'],
-				resource: ['custom'],
+				operation: [
+					'create',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 		options: [
@@ -121,7 +96,6 @@ export const customResourceDescription: INodeProperties[] = [
 						name: 'fieldName',
 						type: 'options',
 						default: '',
-						noDataExpression: true,
 						typeOptions: {
 							loadOptionsMethod: 'getModelFields',
 						},
@@ -138,7 +112,7 @@ export const customResourceDescription: INodeProperties[] = [
 	},
 
 	/* -------------------------------------------------------------------------- */
-	/*                                custom:get                                 */
+	/*                                custom:get                                  */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Custom Resource ID',
@@ -148,13 +122,18 @@ export const customResourceDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['get', 'delete'],
-				resource: ['custom'],
+				operation: [
+					'get',
+					'delete',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 	},
 	/* -------------------------------------------------------------------------- */
-	/*                                custom:getAll                              */
+	/*                                custom:getAll                               */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Return All',
@@ -162,8 +141,12 @@ export const customResourceDescription: INodeProperties[] = [
 		type: 'boolean',
 		displayOptions: {
 			show: {
-				resource: ['custom'],
-				operation: ['getAll'],
+				resource: [
+					'custom',
+				],
+				operation: [
+					'getAll',
+				],
 			},
 		},
 		default: false,
@@ -177,9 +160,15 @@ export const customResourceDescription: INodeProperties[] = [
 		default: 50,
 		displayOptions: {
 			show: {
-				resource: ['custom'],
-				operation: ['getAll'],
-				returnAll: [false],
+				resource: [
+					'custom',
+				],
+				operation: [
+					'getAll',
+				],
+				returnAll: [
+					false,
+				],
 			},
 		},
 		typeOptions: {
@@ -196,8 +185,13 @@ export const customResourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['getAll', 'get'],
-				resource: ['custom'],
+				operation: [
+					'getAll',
+					'get',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 		options: [
@@ -208,13 +202,15 @@ export const customResourceDescription: INodeProperties[] = [
 				default: [],
 				typeOptions: {
 					loadOptionsMethod: 'getModelFields',
-					loadOptionsDependsOn: ['customResource'],
+					loadOptionsDependsOn: [
+						'customResource',
+					],
 				},
 			},
 		],
 	},
 	{
-		displayName: 'Filter Results',
+		displayName: 'Filters',
 		name: 'filterRequest',
 		type: 'fixedCollection',
 		typeOptions: {
@@ -226,8 +222,12 @@ export const customResourceDescription: INodeProperties[] = [
 		placeholder: 'Add condition',
 		displayOptions: {
 			show: {
-				operation: ['getAll'],
-				resource: ['custom'],
+				operation: [
+					'getAll',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 		options: [
@@ -240,9 +240,10 @@ export const customResourceDescription: INodeProperties[] = [
 						name: 'fieldName',
 						type: 'options',
 						default: '',
-						noDataExpression: true,
 						typeOptions: {
-							loadOptionsDependsOn: ['customResource'],
+							loadOptionsDependsOn: [
+								'customResource',
+							],
 							loadOptionsMethod: 'getModelFields',
 						},
 					},
@@ -266,7 +267,7 @@ export const customResourceDescription: INodeProperties[] = [
 								value: 'equal',
 							},
 							{
-								name: '=<',
+								name: '<=',
 								value: 'lesserOrEqual',
 							},
 							{
@@ -278,7 +279,7 @@ export const customResourceDescription: INodeProperties[] = [
 								value: 'greaterOrEqual',
 							},
 							{
-								name: 'Chield Of',
+								name: ' Child of',
 								value: 'childOf',
 							},
 							{
@@ -307,7 +308,7 @@ export const customResourceDescription: INodeProperties[] = [
 		],
 	},
 	/* -------------------------------------------------------------------------- */
-	/*                                custom:update                              */
+	/*                                custom:update                               */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Custom Resource ID',
@@ -317,8 +318,12 @@ export const customResourceDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['custom'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 	},
@@ -335,8 +340,12 @@ export const customResourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['custom'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'custom',
+				],
 			},
 		},
 		options: [
@@ -349,7 +358,6 @@ export const customResourceDescription: INodeProperties[] = [
 						name: 'fieldName',
 						type: 'options',
 						default: '',
-						noDataExpression: true,
 						typeOptions: {
 							loadOptionsMethod: 'getModelFields',
 						},

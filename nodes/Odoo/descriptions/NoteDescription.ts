@@ -1,4 +1,6 @@
-import { INodeProperties } from 'n8n-workflow';
+import {
+	INodeProperties,
+} from 'n8n-workflow';
 
 export const noteOperations: INodeProperties[] = [
 	{
@@ -9,7 +11,9 @@ export const noteOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: {
 			show: {
-				resource: ['note'],
+				resource: [
+					'note',
+				],
 			},
 		},
 		options: [
@@ -44,7 +48,7 @@ export const noteOperations: INodeProperties[] = [
 
 export const noteDescription: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
-	/*                                note:create                              */
+	/*                                note:create                                 */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Memo',
@@ -54,36 +58,43 @@ export const noteDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['create'],
-				resource: ['note'],
+				operation: [
+					'create',
+				],
+				resource: [
+					'note',
+				],
 			},
 		},
-		description: 'Enter note text',
 	},
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		default: {},
-		placeholder: 'Add Field',
-		displayOptions: {
-			show: {
-				operation: ['create'],
-				resource: ['note'],
-			},
-		},
-		options: [
-			{
-				displayName: 'Name',
-				name: 'name',
-				type: 'string',
-				default: '',
-			},
-		],
-	},
+	// {
+	// 	displayName: 'Additional Fields',
+	// 	name: 'additionalFields',
+	// 	type: 'collection',
+	// 	default: {},
+	// 	placeholder: 'Add Field',
+	// 	displayOptions: {
+	// 		show: {
+	// 			operation: [
+	// 				'create',
+	// 			],
+	// 			resource: [
+	// 				'note',
+	// 			],
+	// 		},
+	// 	},
+	// 	options: [
+	// 		{
+	// 			displayName: 'Name',
+	// 			name: 'name',
+	// 			type: 'string',
+	// 			default: '',
+	// 		},
+	// 	],
+	// },
 
 	/* -------------------------------------------------------------------------- */
-	/*                                note:get                                 */
+	/*                                note:get                                    */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Note ID',
@@ -93,13 +104,18 @@ export const noteDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['get', 'delete'],
-				resource: ['note'],
+				operation: [
+					'get',
+					'delete',
+				],
+				resource: [
+					'note',
+				],
 			},
 		},
 	},
 	/* -------------------------------------------------------------------------- */
-	/*                                note:getAll                              */
+	/*                                note:getAll                                 */
 	/* -------------------------------------------------------------------------- */
 
 	{
@@ -108,8 +124,12 @@ export const noteDescription: INodeProperties[] = [
 		type: 'boolean',
 		displayOptions: {
 			show: {
-				resource: ['note'],
-				operation: ['getAll'],
+				resource: [
+					'note',
+				],
+				operation: [
+					'getAll',
+				],
 			},
 		},
 		default: false,
@@ -123,9 +143,15 @@ export const noteDescription: INodeProperties[] = [
 		default: 50,
 		displayOptions: {
 			show: {
-				resource: ['note'],
-				operation: ['getAll'],
-				returnAll: [false],
+				resource: [
+					'note',
+				],
+				operation: [
+					'getAll',
+				],
+				returnAll: [
+					false,
+				],
 			},
 		},
 		typeOptions: {
@@ -142,8 +168,13 @@ export const noteDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: ['getAll', 'get'],
-				resource: ['note'],
+				operation: [
+					'getAll',
+					'get',
+				],
+				resource: [
+					'note',
+				],
 			},
 		},
 		options: [
@@ -159,7 +190,7 @@ export const noteDescription: INodeProperties[] = [
 		],
 	},
 	/* -------------------------------------------------------------------------- */
-	/*                                note:update                              */
+	/*                                note:update                                 */
 	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Note ID',
@@ -169,36 +200,61 @@ export const noteDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['note'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'note',
+				],
 			},
 		},
 	},
 	{
-		displayName: 'Update Fields',
-		name: 'updateFields',
-		type: 'collection',
-		default: {},
-		placeholder: 'Add Field',
+		displayName: 'Memo',
+		name: 'memo',
+		type: 'string',
+		default: '',
+		required: true,
 		displayOptions: {
 			show: {
-				operation: ['update'],
-				resource: ['note'],
+				operation: [
+					'update',
+				],
+				resource: [
+					'note',
+				],
 			},
 		},
-		options: [
-			{
-				displayName: 'Name',
-				name: 'name',
-				type: 'string',
-				default: '',
-			},
-			{
-				displayName: 'Memo',
-				name: 'memo',
-				type: 'string',
-				default: '',
-			},
-		],
 	},
+	// {
+	// 	displayName: 'Update Fields',
+	// 	name: 'updateFields',
+	// 	type: 'collection',
+	// 	default: {},
+	// 	placeholder: 'Add Field',
+	// 	displayOptions: {
+	// 		show: {
+	// 			operation: [
+	// 				'update',
+	// 			],
+	// 			resource: [
+	// 				'note',
+	// 			],
+	// 		},
+	// 	},
+	// 	options: [
+	// 		{
+	// 			displayName: 'Name',
+	// 			name: 'name',
+	// 			type: 'string',
+	// 			default: '',
+	// 		},
+	// 		{
+	// 			displayName: 'Memo',
+	// 			name: 'memo',
+	// 			type: 'string',
+	// 			default: '',
+	// 		},
+	// 	],
+	// },
 ];

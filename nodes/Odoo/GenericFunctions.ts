@@ -1,4 +1,6 @@
-import { OptionsWithUri } from 'request';
+import {
+	OptionsWithUri,
+} from 'request';
 
 import {
 	IExecuteFunctions,
@@ -7,7 +9,11 @@ import {
 	ILoadOptionsFunctions,
 } from 'n8n-core';
 
-import { IDataObject, JsonObject, NodeApiError } from 'n8n-workflow';
+import {
+	IDataObject,
+	JsonObject,
+	NodeApiError,
+} from 'n8n-workflow';
 
 const serviceJSONRPC = 'object';
 const methodJSONRPC = 'execute';
@@ -32,7 +38,7 @@ export const mapFilterOperationToJSONRPC = {
 	greaterThen: '>',
 	lesserThen: '<',
 	greaterOrEqual: '>=',
-	lesserOrEqual: '=<',
+	lesserOrEqual: '<=',
 	like: 'like',
 	in: 'in',
 	notIn: 'not in',
@@ -75,6 +81,14 @@ export interface IOdooResponceFields {
 
 type OdooCRUD = 'create' | 'update' | 'delete' | 'get' | 'getAll';
 
+export function odooGetDBName (databaseName: string | undefined, url: string) {
+	if (databaseName) return databaseName;
+	const odooURL = new URL(url);
+	const hostname = odooURL.hostname;
+	if (!hostname) return '';
+	return odooURL.hostname.split('.')[0];
+}
+
 function processFilters(value: IOdooFilterOperations) {
 	return value.filter?.map((item) => {
 		const operator = item.operator as FilterOperation;
@@ -90,10 +104,10 @@ export function processNameValueFields(value: IDataObject) {
 	}, {});
 }
 
-function processResponceFields(value: IDataObject) {
-	const data = value as unknown as IOdooResponceFields;
-	return data?.fields?.map((entry) => entry.field);
-}
+// function processResponceFields(value: IDataObject) {
+// 	const data = value as unknown as IOdooResponceFields;
+// 	return data?.fields?.map((entry) => entry.field);
+// }
 
 export async function odooJSONRPCRequest(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
@@ -206,9 +220,15 @@ export async function odooGet(
 	operation: OdooCRUD,
 	url: string,
 	itemsID: string,
-	fieldsToReturn?: IDataObject,
+	fieldsToReturn?: IDataObject[],
 ) {
 	try {
+		if (!parseInt(itemsID, 10)) {
+			throw new NodeApiError(this.getNode(), {
+				status: 'Error',
+				message: `Please specify a valid ID: ${itemsID}`,
+			});
+		}
 		const body = {
 			jsonrpc: '2.0',
 			method: 'call',
@@ -222,7 +242,6 @@ export async function odooGet(
 					mapOdooResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					[+itemsID] || [],
-					// (fieldsToReturn && processResponceFields(fieldsToReturn)) || [],
 					fieldsToReturn || [],
 				],
 			},
@@ -245,7 +264,7 @@ export async function odooGetAll(
 	operation: OdooCRUD,
 	url: string,
 	filters?: IOdooFilterOperations,
-	fieldsToReturn?: IDataObject,
+	fieldsToReturn?: IDataObject[],
 	limit = 0,
 ) {
 	try {
@@ -262,7 +281,6 @@ export async function odooGetAll(
 					mapOdooResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					(filters && processFilters(filters)) || [],
-					// (fieldsToReturn && processResponceFields(fieldsToReturn)) || [],
 					fieldsToReturn || [],
 					0, // offset
 					limit,
@@ -290,6 +308,12 @@ export async function odooUpdate(
 	fieldsToUpdate: IDataObject,
 ) {
 	try {
+		if (!Object.keys(fieldsToUpdate).length) {
+			throw new NodeApiError(this.getNode(), {
+				status: 'Error',
+				message: `Please specify at least one field to update`,
+			});
+		}
 		const body = {
 			jsonrpc: '2.0',
 			method: 'call',
