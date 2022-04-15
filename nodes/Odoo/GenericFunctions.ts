@@ -117,7 +117,7 @@ export async function odooJSONRPCRequest(
 	try {
 		const options: OptionsWithUri = {
 			headers: {
-				'User-Agent': 'https://n8n.io',
+				'User-Agent': 'n8n',
 				Connection: 'keep-alive',
 				Accept: '*/*',
 				'Content-Type': 'application/json',
@@ -223,7 +223,7 @@ export async function odooGet(
 	fieldsToReturn?: IDataObject[],
 ) {
 	try {
-		if (!parseInt(itemsID, 10)) {
+		if (!/^\d+$/.test(itemsID) || !parseInt(itemsID, 10)) {
 			throw new NodeApiError(this.getNode(), {
 				status: 'Error',
 				message: `Please specify a valid ID: ${itemsID}`,
@@ -314,6 +314,12 @@ export async function odooUpdate(
 				message: `Please specify at least one field to update`,
 			});
 		}
+		if (!/^\d+$/.test(itemsID) || !parseInt(itemsID, 10)) {
+			throw new NodeApiError(this.getNode(), {
+				status: 'Error',
+				message: `Please specify a valid ID: ${itemsID}`,
+			});
+		}
 		const body = {
 			jsonrpc: '2.0',
 			method: 'call',
@@ -333,8 +339,52 @@ export async function odooUpdate(
 			id: Math.floor(Math.random() * 100),
 		};
 
+		await odooJSONRPCRequest.call(this, body, url);
+		return { id: itemsID };
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as JsonObject);
+	}
+}
+
+export async function odooWorkflow(
+	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
+	db: string,
+	userID: number,
+	password: string,
+	resource: string,
+	customOperation: string,
+	url: string,
+	itemsID: string,
+) {
+	try {
+		if (!/^\d+$/.test(itemsID) || !parseInt(itemsID, 10)) {
+			throw new NodeApiError(this.getNode(), {
+				status: 'Error',
+				message: `Please specify a valid ID: ${itemsID}`,
+			});
+		}
+		const body = {
+			jsonrpc: '2.0',
+			method: 'call',
+			params: {
+				service: "object",
+				method: "execute",
+				args: [
+					db,
+					userID,
+					password,
+					resource,
+					customOperation,
+					[+itemsID] || []
+				],
+			},
+			id: Math.floor(Math.random() * 100),
+		};
+
+		
+
 		const result = await odooJSONRPCRequest.call(this, body, url);
-		return { success: true };
+		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
@@ -350,6 +400,12 @@ export async function odooDelete(
 	url: string,
 	itemsID: string,
 ) {
+	if (!/^\d+$/.test(itemsID) || !parseInt(itemsID, 10)) {
+		throw new NodeApiError(this.getNode(), {
+			status: 'Error',
+			message: `Please specify a valid ID: ${itemsID}`,
+		});
+	}
 	try {
 		const body = {
 			jsonrpc: '2.0',
@@ -369,7 +425,7 @@ export async function odooDelete(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		await odooJSONRPCRequest.call(this, body, url);
 		return { success: true };
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);

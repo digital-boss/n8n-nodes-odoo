@@ -36,6 +36,7 @@ import {
 	odooGetUserID,
 	odooJSONRPCRequest,
 	odooUpdate,
+	odooWorkflow,
 	processNameValueFields,
 } from './GenericFunctions';
 
@@ -251,7 +252,7 @@ export class Odoo implements INodeType {
 
 				const options: OptionsWithUri = {
 					headers: {
-						'User-Agent': 'https://n8n.io',
+						'User-Agent': 'n8n',
 						Connection: 'keep-alive',
 						Accept: '*/*',
 						'Content-Type': 'application/json',
@@ -528,6 +529,21 @@ export class Odoo implements INodeType {
 							url,
 							customResourceId,
 							processNameValueFields(fields),
+						);
+					}
+
+					if (operation === 'workflow') {
+						const customResourceId = this.getNodeParameter('customResourceId', i) as string;
+						const customOperation = this.getNodeParameter('customOperation', i) as string;
+						responseData = await odooWorkflow.call(
+							this,
+							db,
+							userID,
+							password,
+							customResource,
+							customOperation,
+							url,
+							customResourceId,
 						);
 					}
 				}
