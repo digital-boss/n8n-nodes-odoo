@@ -58,6 +58,11 @@ export const customResourceOperations: INodeProperties[] = [
 				value: 'update',
 				description: 'Update an item',
 			},
+			{
+				name: 'Workflow',
+				value: 'workflow',
+				description: 'Trigger a workflow action',
+			},
 		],
 	},
 ];
@@ -371,5 +376,44 @@ export const customResourceDescription: INodeProperties[] = [
 				],
 			},
 		],
+	},
+
+	/* -------------------------------------------------------------------------- */
+	/*                                custom:workflow                             */
+	/* -------------------------------------------------------------------------- */
+	{
+		displayName: 'Custom Resource ID',
+		name: 'customResourceId',
+		type: 'string',
+		default: '',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: [
+					'workflow',
+				],
+				resource: [
+					'custom',
+				],
+			},
+		},
+	},
+	{
+		displayName: 'Custom Operation',
+		name: 'customOperation',
+		type: 'string',
+		default: '',
+		description: 'Trigger any actionable method associated with the resource, such as action_confirm',
+		required: true,
+		displayOptions: {
+			show: {
+				operation: [
+					'workflow',
+				],
+				resource: [
+					'custom',
+				],
+			},
+		},
 	},
 ];
