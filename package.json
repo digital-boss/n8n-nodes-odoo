@@ -2,7 +2,7 @@
     "name": "@digital-boss/n8n-nodes-odoo",
     "version": "0.2.3",
     "description": "A node consuming the Odoo API.",
-    "license": "SEE LICENSE IN LICENSE.md",
+    "license": "MIT",
     "homepage": "https://n8n.io",
     "author": {
         "name": "Steffen Hannesschlaeger",

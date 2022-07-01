@@ -36,3 +36,7 @@ Plesk or C-Panel:
 ```
 node /var/www/vhosts/n8n/bin/n8n
 ```
+
+# License
+
+[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
