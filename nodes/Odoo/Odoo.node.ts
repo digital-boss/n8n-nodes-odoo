@@ -118,9 +118,9 @@ export class Odoo implements INodeType {
 				const db = odooGetDBName(credentials?.db as string, url);
 				const userID = await odooGetUserID.call(this, db, username, password, url);
 
-				const responce = await odooGetModelFields.call(this, db, userID, password, resource, url);
+				const response = await odooGetModelFields.call(this, db, userID, password, resource, url);
 
-				const options = Object.entries(responce).map(([k, v]) => {
+				const options = Object.entries(response).map(([k, v]) => {
 					const optionField = v as { [key: string]: string };
 					return {
 						name: optionField.string,
@@ -159,9 +159,9 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const responce = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = responce.map((model) => {
+				const options = response.map((model) => {
 					return {
 						name: model.name,
 						value: model.model,
@@ -189,9 +189,9 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const responce = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = responce.map((state) => {
+				const options = response.map((state) => {
 					return {
 						name: state.name as string,
 						value: state.id,
@@ -218,9 +218,9 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const responce = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = responce.map((country) => {
+				const options = response.map((country) => {
 					return {
 						name: country.name as string,
 						value: country.id,

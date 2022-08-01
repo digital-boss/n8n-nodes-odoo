@@ -72,7 +72,7 @@ export interface IOdooNameValueFields {
 	}>;
 }
 
-export interface IOdooResponceFields {
+export interface IOdooResponseFields {
 	fields: Array<{
 		field: string;
 		fromList?: boolean;
@@ -104,8 +104,8 @@ export function processNameValueFields(value: IDataObject) {
 	}, {});
 }
 
-// function processResponceFields(value: IDataObject) {
-// 	const data = value as unknown as IOdooResponceFields;
+// function processResponseFields(value: IDataObject) {
+// 	const data = value as unknown as IOdooResponseFields;
 // 	return data?.fields?.map((entry) => entry.field);
 // }
 
@@ -128,13 +128,13 @@ export async function odooJSONRPCRequest(
 			json: true,
 		};
 
-		const responce = await this.helpers.request!(options);
-		if (responce.error) {
-			throw new NodeApiError(this.getNode(), responce.error.data, {
-				message: responce.error.data.message,
+		const response = await this.helpers.request!(options);
+		if (response.error) {
+			throw new NodeApiError(this.getNode(), response.error.data, {
+				message: response.error.data.message,
 			});
 		}
-		return responce.result;
+		return response.result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
@@ -380,8 +380,6 @@ export async function odooWorkflow(
 			},
 			id: Math.floor(Math.random() * 100),
 		};
-
-		
 
 		const result = await odooJSONRPCRequest.call(this, body, url);
 		return result;
