@@ -45,7 +45,6 @@
         "typescript": "~4.3.5"
     },
     "dependencies": {
-        "change-case": "^4.1.1",
         "n8n-core": "~0.105.0",
         "rhea": "^1.0.11"
     },
