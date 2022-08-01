@@ -30,6 +30,7 @@ import {
 	odooCreate,
 	odooDelete,
 	odooGet,
+	odooGetActions,
 	odooGetAll,
 	odooGetDBName,
 	odooGetModelFields,
@@ -228,6 +229,39 @@ export class Odoo implements INodeType {
 				});
 
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
+			},
+			async getActions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				let resource;
+				resource = this.getCurrentNodeParameter('resource') as string;
+				if (resource === 'custom') {
+					resource = this.getCurrentNodeParameter('customResource') as string;
+					if (!resource) return [];
+				}
+
+				const credentials = await this.getCredentials('odooApi');
+				const url = credentials?.url as string;
+				const username = credentials?.username as string;
+				const password = credentials?.password as string;
+				const db = odooGetDBName(credentials?.db as string, url);
+				const userID = await odooGetUserID.call(this, db, username, password, url);
+
+				const response = await odooGetActions.call(
+					this,
+					db,
+					userID,
+					password,
+					resource,
+					url,
+				);
+
+				const options = response.map((x) => {
+					return {
+						name: x,
+						value: x,
+					};
+				});
+
+				return options;
 			},
 		},
 		credentialTest: {

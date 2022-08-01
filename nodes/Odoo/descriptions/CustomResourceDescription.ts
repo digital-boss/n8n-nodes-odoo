@@ -65,6 +65,30 @@ export const customResourceOperations: INodeProperties[] = [
 			},
 		],
 	},
+	{
+		displayName: 'Custom Operation',
+		name: 'customOperation',
+		type: 'options',
+		default: '',
+		description: 'Trigger any actionable method associated with the resource, such as action_confirm',
+		required: true,
+		typeOptions: {
+			loadOptionsDependsOn: [
+				'customResource'
+			],
+			loadOptionsMethod: 'getActions',
+		},
+		displayOptions: {
+			show: {
+				operation: [
+					'workflow',
+				],
+				resource: [
+					'custom',
+				],
+			},
+		},
+	},
 ];
 
 export const customResourceDescription: INodeProperties[] = [
@@ -386,24 +410,6 @@ export const customResourceDescription: INodeProperties[] = [
 		name: 'customResourceId',
 		type: 'string',
 		default: '',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: [
-					'workflow',
-				],
-				resource: [
-					'custom',
-				],
-			},
-		},
-	},
-	{
-		displayName: 'Custom Operation',
-		name: 'customOperation',
-		type: 'string',
-		default: '',
-		description: 'Trigger any actionable method associated with the resource, such as action_confirm',
 		required: true,
 		displayOptions: {
 			show: {

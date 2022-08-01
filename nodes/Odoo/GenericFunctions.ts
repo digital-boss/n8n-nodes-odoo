@@ -61,7 +61,7 @@ export interface IOdooFilterOperations {
 	filter: Array<{
 		fieldName: string;
 		operator: string;
-		value: string;
+		value: string | number;
 	}>;
 }
 
@@ -170,6 +170,47 @@ export async function odooGetModelFields(
 
 		const result = await odooJSONRPCRequest.call(this, body, url);
 		return result;
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as JsonObject);
+	}
+}
+
+export async function odooGetActions(
+	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
+	db: string,
+	userID: number,
+	password: string,
+	resource: string,
+	url: string,
+): Promise<string[]> {
+	try {
+		const body = {
+			jsonrpc: '2.0',
+			method: 'call',
+			params: {
+				service: serviceJSONRPC,
+				method: methodJSONRPC,
+				args: [
+					db,
+					userID,
+					password,
+					'ir.model',
+					'search_read',
+					[['model', '=', resource]],
+					['methods'],
+				],
+			},
+			id: Math.floor(Math.random() * 100),
+		};
+
+		const result = await odooJSONRPCRequest.call(this, body, url);
+		if(result?.length === 1) {
+			const methods = (result as IDataObject[])[0]['methods'];
+			return methods as string[];
+		}
+		else {
+			return [];
+		}
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
