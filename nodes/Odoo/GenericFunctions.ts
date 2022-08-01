@@ -367,15 +367,15 @@ export async function odooWorkflow(
 			jsonrpc: '2.0',
 			method: 'call',
 			params: {
-				service: "object",
-				method: "execute",
+				service: 'object',
+				method: 'execute',
 				args: [
 					db,
 					userID,
 					password,
 					resource,
 					customOperation,
-					[+itemsID] || []
+					[+itemsID] || [],
 				],
 			},
 			id: Math.floor(Math.random() * 100),
