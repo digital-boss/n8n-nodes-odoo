@@ -2,22 +2,16 @@ import {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export const customResourceOperations: INodeProperties[] = [
+export const resourceOperations: INodeProperties[] = [
 	{
-		displayName: 'Custom Resource',
-		name: 'customResource',
+		displayName: 'Resource',
+		name: 'resource',
 		type: 'options',
 		default: '',
 		typeOptions: {
 			loadOptionsMethod: 'getModels',
 		},
-		displayOptions: {
-			show: {
-				resource: [
-					'custom',
-				],
-			},
-		},
+		noDataExpression: true,
 	},
 	{
 		displayName: 'Operation',
@@ -25,13 +19,6 @@ export const customResourceOperations: INodeProperties[] = [
 		type: 'options',
 		default: 'create',
 		noDataExpression: true,
-		displayOptions: {
-			show: {
-				resource: [
-					'custom',
-				],
-			},
-		},
 		options: [
 			{
 				name: 'Create',
@@ -74,7 +61,7 @@ export const customResourceOperations: INodeProperties[] = [
 		required: true,
 		typeOptions: {
 			loadOptionsDependsOn: [
-				'customResource'
+				'resource',
 			],
 			loadOptionsMethod: 'getActions',
 		},
@@ -83,15 +70,12 @@ export const customResourceOperations: INodeProperties[] = [
 				operation: [
 					'workflow',
 				],
-				resource: [
-					'custom',
-				],
 			},
 		},
 	},
 ];
 
-export const customResourceDescription: INodeProperties[] = [
+export const resourceDescription: INodeProperties[] = [
 	/* -------------------------------------------------------------------------- */
 	/*                                custom:create                               */
 	/* -------------------------------------------------------------------------- */
@@ -109,9 +93,6 @@ export const customResourceDescription: INodeProperties[] = [
 			show: {
 				operation: [
 					'create',
-				],
-				resource: [
-					'custom',
 				],
 			},
 		},
@@ -144,9 +125,10 @@ export const customResourceDescription: INodeProperties[] = [
 	/*                                custom:get                                  */
 	/* -------------------------------------------------------------------------- */
 	{
-		displayName: 'Custom Resource ID',
-		name: 'customResourceId',
+		displayName: 'ID',
+		name: 'id',
 		type: 'string',
+		description: 'The resource ID',
 		default: '',
 		required: true,
 		displayOptions: {
@@ -154,9 +136,6 @@ export const customResourceDescription: INodeProperties[] = [
 				operation: [
 					'get',
 					'delete',
-				],
-				resource: [
-					'custom',
 				],
 			},
 		},
@@ -170,9 +149,6 @@ export const customResourceDescription: INodeProperties[] = [
 		type: 'boolean',
 		displayOptions: {
 			show: {
-				resource: [
-					'custom',
-				],
 				operation: [
 					'getAll',
 				],
@@ -189,9 +165,6 @@ export const customResourceDescription: INodeProperties[] = [
 		default: 50,
 		displayOptions: {
 			show: {
-				resource: [
-					'custom',
-				],
 				operation: [
 					'getAll',
 				],
@@ -218,9 +191,6 @@ export const customResourceDescription: INodeProperties[] = [
 					'getAll',
 					'get',
 				],
-				resource: [
-					'custom',
-				],
 			},
 		},
 		options: [
@@ -232,7 +202,7 @@ export const customResourceDescription: INodeProperties[] = [
 				typeOptions: {
 					loadOptionsMethod: 'getModelFields',
 					loadOptionsDependsOn: [
-						'customResource',
+						'resource',
 					],
 				},
 			},
@@ -254,9 +224,6 @@ export const customResourceDescription: INodeProperties[] = [
 				operation: [
 					'getAll',
 				],
-				resource: [
-					'custom',
-				],
 			},
 		},
 		options: [
@@ -271,7 +238,7 @@ export const customResourceDescription: INodeProperties[] = [
 						default: '',
 						typeOptions: {
 							loadOptionsDependsOn: [
-								'customResource',
+								'resource',
 							],
 							loadOptionsMethod: 'getModelFields',
 						},
@@ -292,12 +259,12 @@ export const customResourceDescription: INodeProperties[] = [
 								value: 'lesserThen',
 							},
 							{
-								name: '=',
-								value: 'equal',
-							},
-							{
 								name: '<=',
 								value: 'lesserOrEqual',
+							},
+							{
+								name: '=',
+								value: 'equal',
 							},
 							{
 								name: '>',
@@ -308,7 +275,7 @@ export const customResourceDescription: INodeProperties[] = [
 								value: 'greaterOrEqual',
 							},
 							{
-								name: ' Child of',
+								name: 'Child Of',
 								value: 'childOf',
 							},
 							{
@@ -340,18 +307,17 @@ export const customResourceDescription: INodeProperties[] = [
 	/*                                custom:update                               */
 	/* -------------------------------------------------------------------------- */
 	{
-		displayName: 'Custom Resource ID',
-		name: 'customResourceId',
+		displayName: 'ID',
+		name: 'id',
 		type: 'string',
+		description: 'The resource ID',
 		default: '',
 		required: true,
+		
 		displayOptions: {
 			show: {
 				operation: [
 					'update',
-				],
-				resource: [
-					'custom',
 				],
 			},
 		},
@@ -371,9 +337,6 @@ export const customResourceDescription: INodeProperties[] = [
 			show: {
 				operation: [
 					'update',
-				],
-				resource: [
-					'custom',
 				],
 			},
 		},
@@ -406,18 +369,16 @@ export const customResourceDescription: INodeProperties[] = [
 	/*                                custom:workflow                             */
 	/* -------------------------------------------------------------------------- */
 	{
-		displayName: 'Custom Resource ID',
-		name: 'customResourceId',
+		displayName: 'ID',
+		name: 'id',
 		type: 'string',
+		description: 'The resource ID',
 		default: '',
 		required: true,
 		displayOptions: {
 			show: {
 				operation: [
 					'workflow',
-				],
-				resource: [
-					'custom',
 				],
 			},
 		},

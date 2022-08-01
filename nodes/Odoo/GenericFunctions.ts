@@ -203,12 +203,11 @@ export async function odooGetActions(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
-		if(result?.length === 1) {
-			const methods = (result as IDataObject[])[0]['methods'];
+		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+		if(result?.length === 1 && result[0].hasOwnProperty('methods')) {
+			const methods = result[0]['methods'];
 			return methods as string[];
-		}
-		else {
+		} else {
 			return [];
 		}
 	} catch (error) {

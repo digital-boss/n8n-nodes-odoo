@@ -15,17 +15,6 @@ import {
 } from 'n8n-workflow';
 
 import {
-	contactDescription,
-	contactOperations,
-	customResourceDescription,
-	customResourceOperations,
-	noteDescription,
-	noteOperations,
-	opportunityDescription,
-	opportunityOperations,
-} from './descriptions';
-
-import {
 	IOdooFilterOperations,
 	odooCreate,
 	odooDelete,
@@ -40,6 +29,7 @@ import {
 	odooWorkflow,
 	processNameValueFields,
 } from './GenericFunctions';
+import { resourceDescription, resourceOperations } from './ResourceDescription';
 
 export class Odoo implements INodeType {
 	description: INodeTypeDescription = {
@@ -64,41 +54,8 @@ export class Odoo implements INodeType {
 			},
 		],
 		properties: [
-			{
-				displayName: 'Resource',
-				name: 'resource',
-				type: 'options',
-				default: 'contact',
-				noDataExpression: true,
-				options: [
-					{
-						name: 'Contact',
-						value: 'contact',
-					},
-					{
-						name: 'Custom Resource',
-						value: 'custom',
-					},
-					{
-						name: 'Note',
-						value: 'note',
-					},
-					{
-						name: 'Opportunity',
-						value: 'opportunity',
-					},
-				],
-				description: 'The resource to operate on',
-			},
-
-			...customResourceOperations,
-			...customResourceDescription,
-			...opportunityOperations,
-			...opportunityDescription,
-			...contactOperations,
-			...contactDescription,
-			...noteOperations,
-			...noteDescription,
+			...resourceOperations,
+			...resourceDescription,
 		],
 	};
 
@@ -107,9 +64,8 @@ export class Odoo implements INodeType {
 			async getModelFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				let resource;
 				resource = this.getCurrentNodeParameter('resource') as string;
-				if (resource === 'custom') {
-					resource = this.getCurrentNodeParameter('customResource') as string;
-					if (!resource) return [];
+				if (!resource) {
+					return [];
 				}
 
 				const credentials = await this.getCredentials('odooApi');
@@ -233,9 +189,8 @@ export class Odoo implements INodeType {
 			async getActions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				let resource;
 				resource = this.getCurrentNodeParameter('resource') as string;
-				if (resource === 'custom') {
-					resource = this.getCurrentNodeParameter('customResource') as string;
-					if (!resource) return [];
+				if (!resource) {
+					return [];
 				}
 
 				const credentials = await this.getCredentials('odooApi');
@@ -343,27 +298,59 @@ export class Odoo implements INodeType {
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-				if (resource === 'contact') {
-					if (operation === 'create') {
-						let additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+				const resource = this.getNodeParameter('resource', i) as string;
+				if (operation === 'create') {
+					const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
+					responseData = await odooCreate.call(
+						this,
+						db,
+						userID,
+						password,
+						resource,
+						operation,
+						url,
+						processNameValueFields(fields),
+					);
+				}
 
-						if (additionalFields.address) {
-							const addressFields = (additionalFields.address as IDataObject).value as IDataObject;
-							if (addressFields) {
-								additionalFields = {
-									...additionalFields,
-									...addressFields,
-								};
-							}
-							delete additionalFields.address;
-						}
+				if (operation === 'delete') {
+					const id = this.getNodeParameter('id', i) as string;
+					responseData = await odooDelete.call(
+						this,
+						db,
+						userID,
+						password,
+						resource,
+						operation,
+						url,
+						id,
+					);
+				}
 
-						const name = this.getNodeParameter('contactName', i) as string;
-						const fields: IDataObject = {
-							name,
-							...additionalFields,
-						};
-						responseData = await odooCreate.call(
+				if (operation === 'get') {
+					const id = this.getNodeParameter('id', i) as string;
+					const options = this.getNodeParameter('options', i) as IDataObject;
+					const fields = options.fieldsList as IDataObject[] || [];
+					responseData = await odooGet.call(
+						this,
+						db,
+						userID,
+						password,
+						resource,
+						operation,
+						url,
+						id,
+						fields,
+					);
+				}
+
+				if (operation === 'getAll') {
+					const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+					const options = this.getNodeParameter('options', i) as IDataObject;
+					const fields = options.fieldsList as IDataObject[] || [];
+					const filter = this.getNodeParameter('filterRequest', i) as IOdooFilterOperations;
+					if (returnAll) {
+						responseData = await odooGetAll.call(
 							this,
 							db,
 							userID,
@@ -371,13 +358,12 @@ export class Odoo implements INodeType {
 							resource,
 							operation,
 							url,
+							filter,
 							fields,
 						);
-					}
-
-					if (operation === 'delete') {
-						const contactId = this.getNodeParameter('contactId', i) as string;
-						responseData = await odooDelete.call(
+					} else {
+						const limit = this.getNodeParameter('limit', i) as number;
+						responseData = await odooGetAll.call(
 							this,
 							db,
 							userID,
@@ -385,406 +371,42 @@ export class Odoo implements INodeType {
 							resource,
 							operation,
 							url,
-							contactId,
-						);
-					}
-
-					if (operation === 'get') {
-						const contactId = this.getNodeParameter('contactId', i) as string;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						responseData = await odooGet.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							contactId,
+							filter,
 							fields,
-						);
-					}
-
-					if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						if (returnAll) {
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined,
-								fields,
-							);
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined, // filters, only for custom resource
-								fields,
-								limit,
-							);
-						}
-					}
-
-					if (operation === 'update') {
-						const contactId = this.getNodeParameter('contactId', i) as string;
-						let updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
-
-						if (updateFields.address) {
-							const addressFields = (updateFields.address as IDataObject).value as IDataObject;
-							if (addressFields) {
-								updateFields = {
-									...updateFields,
-									...addressFields,
-								};
-							}
-							delete updateFields.address;
-						}
-
-						responseData = await odooUpdate.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							contactId,
-							updateFields,
+							limit,
 						);
 					}
 				}
 
-				if (resource === 'custom') {
-					const customResource = this.getNodeParameter('customResource', i) as string;
-					if (operation === 'create') {
-						const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
-						responseData = await odooCreate.call(
-							this,
-							db,
-							userID,
-							password,
-							customResource,
-							operation,
-							url,
-							processNameValueFields(fields),
-						);
-					}
-
-					if (operation === 'delete') {
-						const customResourceId = this.getNodeParameter('customResourceId', i) as string;
-						responseData = await odooDelete.call(
-							this,
-							db,
-							userID,
-							password,
-							customResource,
-							operation,
-							url,
-							customResourceId,
-						);
-					}
-
-					if (operation === 'get') {
-						const customResourceId = this.getNodeParameter('customResourceId', i) as string;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						responseData = await odooGet.call(
-							this,
-							db,
-							userID,
-							password,
-							customResource,
-							operation,
-							url,
-							customResourceId,
-							fields,
-						);
-					}
-
-					if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						const filter = this.getNodeParameter('filterRequest', i) as IOdooFilterOperations;
-						if (returnAll) {
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								customResource,
-								operation,
-								url,
-								filter,
-								fields,
-							);
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								customResource,
-								operation,
-								url,
-								filter,
-								fields,
-								limit,
-							);
-						}
-					}
-
-					if (operation === 'update') {
-						const customResourceId = this.getNodeParameter('customResourceId', i) as string;
-						const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
-						responseData = await odooUpdate.call(
-							this,
-							db,
-							userID,
-							password,
-							customResource,
-							operation,
-							url,
-							customResourceId,
-							processNameValueFields(fields),
-						);
-					}
-
-					if (operation === 'workflow') {
-						const customResourceId = this.getNodeParameter('customResourceId', i) as string;
-						const customOperation = this.getNodeParameter('customOperation', i) as string;
-						responseData = await odooWorkflow.call(
-							this,
-							db,
-							userID,
-							password,
-							customResource,
-							customOperation,
-							url,
-							customResourceId,
-						);
-					}
+				if (operation === 'update') {
+					const id = this.getNodeParameter('id', i) as string;
+					const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
+					responseData = await odooUpdate.call(
+						this,
+						db,
+						userID,
+						password,
+						resource,
+						operation,
+						url,
+						id,
+						processNameValueFields(fields),
+					);
 				}
 
-				if (resource === 'note') {
-					if (operation === 'create') {
-						// const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
-						const memo = this.getNodeParameter('memo', i) as string;
-						const fields: IDataObject = {
-							memo,
-							// ...additionalFields,
-						};
-						responseData = await odooCreate.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							fields,
-						);
-					}
-
-					if (operation === 'delete') {
-						const noteId = this.getNodeParameter('noteId', i) as string;
-						responseData = await odooDelete.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							noteId,
-						);
-					}
-
-					if (operation === 'get') {
-						const noteId = this.getNodeParameter('noteId', i) as string;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						responseData = await odooGet.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							noteId,
-							fields,
-						);
-					}
-
-					if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						if (returnAll) {
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined,
-								fields,
-							);
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined, // filters, only for custom resource
-								fields,
-								limit,
-							);
-						}
-					}
-
-					if (operation === 'update') {
-						const noteId = this.getNodeParameter('noteId', i) as string;
-						const memo = this.getNodeParameter('memo', i) as string;
-						const fields: IDataObject = {
-							memo,
-						};
-						responseData = await odooUpdate.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							noteId,
-							fields,
-						);
-					}
-				}
-
-				if (resource === 'opportunity') {
-					if (operation === 'create') {
-						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
-						const name = this.getNodeParameter('opportunityName', i) as string;
-						const fields: IDataObject = {
-							name,
-							...additionalFields,
-						};
-
-						responseData = await odooCreate.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							fields,
-						);
-					}
-
-					if (operation === 'delete') {
-						const opportunityId = this.getNodeParameter('opportunityId', i) as string;
-						responseData = await odooDelete.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							opportunityId,
-						);
-					}
-
-					if (operation === 'get') {
-						const opportunityId = this.getNodeParameter('opportunityId', i) as string;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						responseData = await odooGet.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							opportunityId,
-							fields,
-						);
-					}
-
-					if (operation === 'getAll') {
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const options = this.getNodeParameter('options', i) as IDataObject;
-						const fields = options.fieldsList as IDataObject[] || [];
-						if (returnAll) {
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined,
-								fields,
-							);
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							responseData = await odooGetAll.call(
-								this,
-								db,
-								userID,
-								password,
-								resource,
-								operation,
-								url,
-								undefined, // filters, only for custom resource
-								fields,
-								limit,
-							);
-						}
-					}
-
-					if (operation === 'update') {
-						const opportunityId = this.getNodeParameter('opportunityId', i) as string;
-						const updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
-						responseData = await odooUpdate.call(
-							this,
-							db,
-							userID,
-							password,
-							resource,
-							operation,
-							url,
-							opportunityId,
-							updateFields,
-						);
-					}
+				if (operation === 'workflow') {
+					const id = this.getNodeParameter('id', i) as string;
+					const customOperation = this.getNodeParameter('customOperation', i) as string;
+					responseData = await odooWorkflow.call(
+						this,
+						db,
+						userID,
+						password,
+						resource,
+						customOperation,
+						url,
+						id,
+					);
 				}
 
 				if (Array.isArray(responseData)) {
