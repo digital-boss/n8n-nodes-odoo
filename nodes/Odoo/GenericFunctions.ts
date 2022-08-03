@@ -175,14 +175,55 @@ export async function odooGetModelFields(
 	}
 }
 
-export async function odooGetActions(
+export async function odooIsAddonInstalled(
+	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
+): Promise<boolean> {
+	try {
+		const credentials = await this.getCredentials('odooApi');
+		const url = credentials?.url as string;
+		const username = credentials?.username as string;
+		const password = credentials?.password as string;
+		const db = odooGetDBName(credentials?.db as string, url);
+		const userID = await odooGetUserID.call(this, db, username, password, url);
+
+		const body = {
+			jsonrpc: '2.0',
+			method: 'call',
+			params: {
+				service: serviceJSONRPC,
+				method: methodJSONRPC,
+				args: [
+					db,
+					userID,
+					password,
+					'ir.model',
+					'search_read',
+					[['model', '=', 'base']],
+					[],
+				],
+			},
+			id: Math.floor(Math.random() * 100),
+		};
+
+		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+		if(result?.length === 1 && result[0].hasOwnProperty('methods')) {
+			return true;
+		} else {
+			return false;
+		}
+	} catch (error) {
+		return false;
+	}
+}
+
+export async function odooGetActionMethods(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
 	url: string,
-): Promise<string[]> {
+): Promise<string[] | undefined> {
 	try {
 		const body = {
 			jsonrpc: '2.0',
@@ -208,7 +249,7 @@ export async function odooGetActions(
 			const methods = result[0]['methods'];
 			return methods as string[];
 		} else {
-			return [];
+			return undefined;
 		}
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);

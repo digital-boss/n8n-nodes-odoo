@@ -19,11 +19,12 @@ import {
 	odooCreate,
 	odooDelete,
 	odooGet,
-	odooGetActions,
+	odooGetActionMethods,
 	odooGetAll,
 	odooGetDBName,
 	odooGetModelFields,
 	odooGetUserID,
+	odooIsAddonInstalled,
 	odooJSONRPCRequest,
 	odooUpdate,
 	odooWorkflow,
@@ -200,7 +201,7 @@ export class Odoo implements INodeType {
 				const db = odooGetDBName(credentials?.db as string, url);
 				const userID = await odooGetUserID.call(this, db, username, password, url);
 
-				const response = await odooGetActions.call(
+				const response = await odooGetActionMethods.call(
 					this,
 					db,
 					userID,
@@ -209,14 +210,60 @@ export class Odoo implements INodeType {
 					url,
 				);
 
-				const options = response.map((x) => {
-					return {
-						name: x,
-						value: x,
-					};
-				});
+				if(response) {
+					const options = response.map((x) => {
+						return {
+							name: x,
+							value: x,
+						};
+					});
 
-				return options;
+					return options;
+				} else {
+					return [];
+				}
+			},
+			async getOperations(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const operations = [
+					{
+						name: 'Create',
+						value: 'create',
+						description: 'Create a new item',
+					},
+					{
+						name: 'Delete',
+						value: 'delete',
+						description: 'Delete an item',
+					},
+					{
+						name: 'Get',
+						value: 'get',
+						description: 'Get an item',
+					},
+					{
+						name: 'Get All',
+						value: 'getAll',
+						description: 'Get all items',
+					},
+					{
+						name: 'Update',
+						value: 'update',
+						description: 'Update an item',
+					},
+					
+				];
+
+				const installed = await odooIsAddonInstalled.call(this);
+
+				if (installed) {
+					operations.push({
+						name: 'Workflow',
+						value: 'workflow',
+						description: 'Trigger a workflow action',
+					});
+				}
+
+				return operations;
 			},
 		},
 		credentialTest: {

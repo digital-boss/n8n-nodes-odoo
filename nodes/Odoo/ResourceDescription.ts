@@ -19,38 +19,9 @@ export const resourceOperations: INodeProperties[] = [
 		type: 'options',
 		default: 'create',
 		noDataExpression: true,
-		options: [
-			{
-				name: 'Create',
-				value: 'create',
-				description: 'Create a new item',
-			},
-			{
-				name: 'Delete',
-				value: 'delete',
-				description: 'Delete an item',
-			},
-			{
-				name: 'Get',
-				value: 'get',
-				description: 'Get an item',
-			},
-			{
-				name: 'Get All',
-				value: 'getAll',
-				description: 'Get all items',
-			},
-			{
-				name: 'Update',
-				value: 'update',
-				description: 'Update an item',
-			},
-			{
-				name: 'Workflow',
-				value: 'workflow',
-				description: 'Trigger a workflow action',
-			},
-		],
+		typeOptions: {
+			loadOptionsMethod: 'getOperations',
+		},
 	},
 	{
 		displayName: 'Custom Operation',
