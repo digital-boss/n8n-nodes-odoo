@@ -321,7 +321,7 @@ export class Odoo implements INodeType {
 		const returnData: IDataObject[] = [];
 		let responseData;
 
-		// const resource = this.getNodeParameter('resource', 0) as string;
+		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
 		const credentials = await this.getCredentials('odooApi');
@@ -337,7 +337,6 @@ export class Odoo implements INodeType {
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-				const resource = this.getNodeParameter('resource', i) as string;
 				if (operation === 'create') {
 					const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
 					responseData = await odooCreate.call(
