@@ -332,6 +332,7 @@ export async function odooGetAll(
 	url: string,
 	filters?: IOdooFilterOperations,
 	fieldsToReturn?: IDataObject[],
+	offset = 0,
 	limit = 0,
 ) {
 	try {
@@ -349,7 +350,7 @@ export async function odooGetAll(
 					mapOperationToJSONRPC[operation],
 					(filters && processFilters(filters)) || [],
 					fieldsToReturn || [],
-					0, // offset
+					offset,
 					limit,
 				],
 			},

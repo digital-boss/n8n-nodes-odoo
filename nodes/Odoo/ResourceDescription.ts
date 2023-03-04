@@ -118,6 +118,22 @@ export const resourceDescription: INodeProperties[] = [
 	},
 
 	{
+		displayName: 'Offset',
+		name: 'offset',
+		type: 'number',
+		default: 0,
+		displayOptions: {
+			show: {
+				operation: ['getAll'],
+				returnAll: [false],
+			},
+		},
+		typeOptions: {
+			minValue: 0,
+		},
+		description: 'Number of results to skip',
+	},
+	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',

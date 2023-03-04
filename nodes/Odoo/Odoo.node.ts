@@ -401,6 +401,7 @@ export class Odoo implements INodeType {
 							fields,
 						);
 					} else {
+						const offset = this.getNodeParameter('offset', i) as number;
 						const limit = this.getNodeParameter('limit', i) as number;
 						responseData = await odooGetAll.call(
 							this,
@@ -412,6 +413,7 @@ export class Odoo implements INodeType {
 							url,
 							filter,
 							fields,
+							offset,
 							limit,
 						);
 					}
