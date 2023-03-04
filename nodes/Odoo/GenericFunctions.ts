@@ -1,6 +1,4 @@
-import {
-	OptionsWithUri,
-} from 'request';
+import { OptionsWithUri } from 'request';
 
 import {
 	IExecuteFunctions,
@@ -9,11 +7,7 @@ import {
 	ILoadOptionsFunctions,
 } from 'n8n-core';
 
-import {
-	IDataObject,
-	JsonObject,
-	NodeApiError,
-} from 'n8n-workflow';
+import { IDataObject, JsonObject, NodeApiError } from 'n8n-workflow';
 
 const serviceJSONRPC = 'object';
 const methodJSONRPC = 'execute';
@@ -81,7 +75,7 @@ export interface IOdooResponseFields {
 
 type OdooCRUD = 'create' | 'update' | 'delete' | 'get' | 'getAll';
 
-export function odooGetDBName (databaseName: string | undefined, url: string) {
+export function odooGetDBName(databaseName: string | undefined, url: string) {
 	if (databaseName) return databaseName;
 	const odooURL = new URL(url);
 	const hostname = odooURL.hostname;
@@ -192,21 +186,13 @@ export async function odooIsAddonInstalled(
 			params: {
 				service: serviceJSONRPC,
 				method: methodJSONRPC,
-				args: [
-					db,
-					userID,
-					password,
-					'ir.model',
-					'search_read',
-					[['model', '=', 'base']],
-					[],
-				],
+				args: [db, userID, password, 'ir.model', 'search_read', [['model', '=', 'base']], []],
 			},
 			id: Math.floor(Math.random() * 100),
 		};
 
 		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
-		if(result?.length === 1 && result[0].hasOwnProperty('methods')) {
+		if (result?.length === 1 && result[0].hasOwnProperty('methods')) {
 			return true;
 		} else {
 			return false;
@@ -245,7 +231,7 @@ export async function odooGetActionMethods(
 		};
 
 		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
-		if(result?.length === 1 && result[0].hasOwnProperty('methods')) {
+		if (result?.length === 1 && result[0].hasOwnProperty('methods')) {
 			const methods = result[0]['methods'];
 			return methods as string[];
 		} else {
@@ -450,14 +436,7 @@ export async function odooWorkflow(
 			params: {
 				service: 'object',
 				method: 'execute',
-				args: [
-					db,
-					userID,
-					password,
-					resource,
-					customOperation,
-					[+itemsID] || [],
-				],
+				args: [db, userID, password, resource, customOperation, [+itemsID] || []],
 			},
 			id: Math.floor(Math.random() * 100),
 		};

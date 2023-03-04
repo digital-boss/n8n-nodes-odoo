@@ -1,6 +1,4 @@
-import {
-	INodeProperties,
-} from 'n8n-workflow';
+import { INodeProperties } from 'n8n-workflow';
 
 export const resourceOperations: INodeProperties[] = [
 	{
@@ -17,7 +15,7 @@ export const resourceOperations: INodeProperties[] = [
 		displayName: 'Operation',
 		name: 'operation',
 		type: 'options',
-		default: 'create',
+		default: '',
 		noDataExpression: true,
 		typeOptions: {
 			loadOptionsMethod: 'getOperations',
@@ -28,19 +26,16 @@ export const resourceOperations: INodeProperties[] = [
 		name: 'customOperation',
 		type: 'options',
 		default: '',
-		description: 'Trigger any actionable method associated with the resource, such as action_confirm',
+		description:
+			'Trigger any actionable method associated with the resource, such as action_confirm',
 		required: true,
 		typeOptions: {
-			loadOptionsDependsOn: [
-				'resource',
-			],
+			loadOptionsDependsOn: ['resource'],
 			loadOptionsMethod: 'getActions',
 		},
 		displayOptions: {
 			show: {
-				operation: [
-					'workflow',
-				],
+				operation: ['workflow'],
 			},
 		},
 	},
@@ -62,9 +57,7 @@ export const resourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: [
-					'create',
-				],
+				operation: ['create'],
 			},
 		},
 		options: [
@@ -104,10 +97,7 @@ export const resourceDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: [
-					'get',
-					'delete',
-				],
+				operation: ['get', 'delete'],
 			},
 		},
 	},
@@ -120,9 +110,7 @@ export const resourceDescription: INodeProperties[] = [
 		type: 'boolean',
 		displayOptions: {
 			show: {
-				operation: [
-					'getAll',
-				],
+				operation: ['getAll'],
 			},
 		},
 		default: false,
@@ -136,12 +124,8 @@ export const resourceDescription: INodeProperties[] = [
 		default: 50,
 		displayOptions: {
 			show: {
-				operation: [
-					'getAll',
-				],
-				returnAll: [
-					false,
-				],
+				operation: ['getAll'],
+				returnAll: [false],
 			},
 		},
 		typeOptions: {
@@ -158,10 +142,7 @@ export const resourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: [
-					'getAll',
-					'get',
-				],
+				operation: ['getAll', 'get'],
 			},
 		},
 		options: [
@@ -172,9 +153,7 @@ export const resourceDescription: INodeProperties[] = [
 				default: [],
 				typeOptions: {
 					loadOptionsMethod: 'getModelFields',
-					loadOptionsDependsOn: [
-						'resource',
-					],
+					loadOptionsDependsOn: ['resource'],
 				},
 			},
 		],
@@ -192,9 +171,7 @@ export const resourceDescription: INodeProperties[] = [
 		placeholder: 'Add condition',
 		displayOptions: {
 			show: {
-				operation: [
-					'getAll',
-				],
+				operation: ['getAll'],
 			},
 		},
 		options: [
@@ -208,9 +185,7 @@ export const resourceDescription: INodeProperties[] = [
 						type: 'options',
 						default: '',
 						typeOptions: {
-							loadOptionsDependsOn: [
-								'resource',
-							],
+							loadOptionsDependsOn: ['resource'],
 							loadOptionsMethod: 'getModelFields',
 						},
 					},
@@ -284,12 +259,10 @@ export const resourceDescription: INodeProperties[] = [
 		description: 'The resource ID',
 		default: '',
 		required: true,
-		
+
 		displayOptions: {
 			show: {
-				operation: [
-					'update',
-				],
+				operation: ['update'],
 			},
 		},
 	},
@@ -306,9 +279,7 @@ export const resourceDescription: INodeProperties[] = [
 		placeholder: 'Add Field',
 		displayOptions: {
 			show: {
-				operation: [
-					'update',
-				],
+				operation: ['update'],
 			},
 		},
 		options: [
@@ -348,9 +319,7 @@ export const resourceDescription: INodeProperties[] = [
 		required: true,
 		displayOptions: {
 			show: {
-				operation: [
-					'workflow',
-				],
+				operation: ['workflow'],
 			},
 		},
 	},

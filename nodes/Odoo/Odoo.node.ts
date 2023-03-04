@@ -43,7 +43,6 @@ export class Odoo implements INodeType {
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		defaults: {
 			name: 'Odoo',
-			color: '#714B67',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
@@ -54,10 +53,7 @@ export class Odoo implements INodeType {
 				testedBy: 'odooApiTest',
 			},
 		],
-		properties: [
-			...resourceOperations,
-			...resourceDescription,
-		],
+		properties: [...resourceOperations, ...resourceDescription],
 	};
 
 	methods = {
@@ -201,16 +197,9 @@ export class Odoo implements INodeType {
 				const db = odooGetDBName(credentials?.db as string, url);
 				const userID = await odooGetUserID.call(this, db, username, password, url);
 
-				const response = await odooGetActionMethods.call(
-					this,
-					db,
-					userID,
-					password,
-					resource,
-					url,
-				);
+				const response = await odooGetActionMethods.call(this, db, userID, password, resource, url);
 
-				if(response) {
+				if (response) {
 					const options = response.map((x) => {
 						return {
 							name: x,
@@ -241,7 +230,7 @@ export class Odoo implements INodeType {
 						description: 'Get an item',
 					},
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
 						description: 'Get all items',
 					},
@@ -250,7 +239,6 @@ export class Odoo implements INodeType {
 						value: 'update',
 						description: 'Update an item',
 					},
-					
 				];
 
 				const installed = await odooIsAddonInstalled.call(this);
@@ -280,7 +268,11 @@ export class Odoo implements INodeType {
 						params: {
 							service: 'common',
 							method: 'login',
-							args: [odooGetDBName(credentials?.db as string, credentials?.url as string), credentials?.username, credentials?.password],
+							args: [
+								odooGetDBName(credentials?.db as string, credentials?.url as string),
+								credentials?.username,
+								credentials?.password,
+							],
 						},
 						id: Math.floor(Math.random() * 100),
 					};
@@ -329,7 +321,7 @@ export class Odoo implements INodeType {
 		const returnData: IDataObject[] = [];
 		let responseData;
 
-		const resource = this.getNodeParameter('resource', 0) as string;
+		// const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
 		const credentials = await this.getCredentials('odooApi');
@@ -377,7 +369,7 @@ export class Odoo implements INodeType {
 				if (operation === 'get') {
 					const id = this.getNodeParameter('id', i) as string;
 					const options = this.getNodeParameter('options', i) as IDataObject;
-					const fields = options.fieldsList as IDataObject[] || [];
+					const fields = (options.fieldsList as IDataObject[]) || [];
 					responseData = await odooGet.call(
 						this,
 						db,
@@ -394,7 +386,7 @@ export class Odoo implements INodeType {
 				if (operation === 'getAll') {
 					const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 					const options = this.getNodeParameter('options', i) as IDataObject;
-					const fields = options.fieldsList as IDataObject[] || [];
+					const fields = (options.fieldsList as IDataObject[]) || [];
 					const filter = this.getNodeParameter('filterRequest', i) as IOdooFilterOperations;
 					if (returnAll) {
 						responseData = await odooGetAll.call(
