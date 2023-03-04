@@ -1,32 +1,25 @@
 {
 	"compilerOptions": {
-		"lib": [
-			"dom",
-			"es2019"
-		],
-		"types": [
-			"node",
-			"jest"
-		],
-		"module": "commonjs",
-		"removeComments": true,
 		"strict": true,
-		"preserveConstEnums": true,
-		"resolveJsonModule": true,
-		"declaration": true,
-		"outDir": "./dist/",
+		"module": "commonjs",
+		"moduleResolution": "node",
 		"target": "es2019",
-		"sourceMap": true
+		"lib": ["es2019", "es2020", "es2022.error", "dom"],
+		"removeComments": true,
+		"useUnknownInCatchVariables": false,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"strictNullChecks": true,
+		"preserveConstEnums": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"incremental": true,
+		"declaration": true,
+		"sourceMap": true,
+		"skipLibCheck": true,
+		"outDir": "./dist/"
 	},
-	"include": [
-		"credentials/**/*",
-		"src/**/*",
-		"nodes/**/*",
-		"nodes/**/*.json",
-		"credentials/translations/**/*.json",
-		"test/**/*"
-	],
-	"exclude": [
-		"**/*.spec.ts"
-	]
+	"include": ["credentials/**/*", "nodes/**/*", "nodes/**/*.json", "package.json"]
 }
