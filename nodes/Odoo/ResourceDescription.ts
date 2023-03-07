@@ -10,7 +10,6 @@ export const resourceOperations: INodeProperties[] = [
 		typeOptions: {
 			loadOptionsMethod: 'getModels',
 		},
-		noDataExpression: true,
 	},
 	{
 		displayName: 'Operation',
@@ -18,7 +17,6 @@ export const resourceOperations: INodeProperties[] = [
 		type: 'options',
 		default: '',
 		description: 'Choose from the list',
-		noDataExpression: true,
 		typeOptions: {
 			loadOptionsMethod: 'getOperations',
 		},
