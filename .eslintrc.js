@@ -52,6 +52,7 @@ module.exports = {
 				'n8n-nodes-base/node-param-description-wrong-for-dynamic-options': 'off',
 				'n8n-nodes-base/node-param-description-missing-from-dynamic-multi-options': 'off',
 				'n8n-nodes-base/node-param-resource-without-no-data-expression': 'off',
+				'n8n-nodes-base/node-param-operation-without-no-data-expression': 'off',
 			},
 		},
 	],
