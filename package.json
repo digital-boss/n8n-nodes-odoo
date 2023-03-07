@@ -1,6 +1,6 @@
 {
 	"name": "@digital-boss/n8n-nodes-odoo",
-	"version": "0.4.1",
+	"version": "0.4.2",
 	"description": "A node consuming the Odoo API.",
 	"keywords": [
 		"n8n",
