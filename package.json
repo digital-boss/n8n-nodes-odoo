@@ -1,13 +1,13 @@
 {
-	"name": "@digital-boss/n8n-nodes-odoo",
+	"name": "n8n-nodes-flectra",
 	"version": "0.4.2",
-	"description": "A node consuming the Odoo API.",
+	"description": "A node consuming the Flectra API.",
 	"keywords": [
 		"n8n",
 		"workflow",
 		"n8n-community-node-package",
-		"digital boss",
-		"odoo"
+		"szsolutions",
+		"flectra"
 	],
 	"license": "MIT",
 	"homepage": "https://n8n.io",
@@ -17,7 +17,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/digital-boss/n8n-nodes-odoo"
+		"url": "https://github.com/webfondue/n8n-nodes-flectra"
 	},
 	"main": "index.js",
 	"scripts": {
@@ -34,10 +34,10 @@
 	"n8n": {
 		"n8nNodesApiVersion": 1,
 		"credentials": [
-			"dist/credentials/OdooApi.credentials.js"
+			"dist/credentials/FlectraApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Odoo/Odoo.node.js"
+			"dist/nodes/Flectra/Flectra.node.js"
 		]
 	},
 	"devDependencies": {

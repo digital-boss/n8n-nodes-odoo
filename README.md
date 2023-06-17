@@ -1,15 +1,15 @@
-# n8n-nodes-odoo
+# n8n-nodes-flectra
 
 ![n8n.io - Workflow Automation](https://raw.githubusercontent.com/n8n-io/n8n/master/assets/n8n-logo.png)
 
-This Odoo custom node is created from a [pull request](https://github.com/n8n-io/n8n/pull/2601) to n8n.
+This Flectra custom node is a fork of [n8n-node-odoo](https://github.com/digital-boss/n8n-nodes-odoo) with additional workflow arguments.
 
 # If you have n8n installed: Install custom nodes module
 
 Install it to the n8n root folder. This is the node_modules folder on the same level of n8n and n8n-core. This differs when you used the -g flag on n8n initial installation. From there do:
 
 ```
-npm install @digital-boss/n8n-nodes-odoo
+npm install n8n-nodes-flectra
 ```
 
 # IFresh install n8n
@@ -25,7 +25,7 @@ npm init --yes
 
 npm install n8n
 
-npm install @digital-boss/n8n-nodes-odoo
+npm install n8n-nodes-flectra
 ```
 
 # Start n8n

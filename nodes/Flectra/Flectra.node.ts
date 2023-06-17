@@ -15,42 +15,42 @@ import {
 } from 'n8n-workflow';
 
 import {
-	IOdooFilterOperations,
-	odooCreate,
-	odooDelete,
-	odooGet,
-	odooGetActionMethods,
-	odooGetAll,
-	odooGetDBName,
-	odooGetModelFields,
-	odooGetUserID,
-	odooIsAddonInstalled,
-	odooJSONRPCRequest,
-	odooUpdate,
-	odooWorkflow,
+	IFlectraFilterOperations,
+	flectraCreate,
+	flectraDelete,
+	flectraGet,
+	flectraGetActionMethods,
+	flectraGetAll,
+	flectraGetDBName,
+	flectraGetModelFields,
+	flectraGetUserID,
+	flectraIsAddonInstalled,
+	flectraJSONRPCRequest,
+	flectraUpdate,
+	flectraWorkflow,
 	processNameValueFields,
 } from './GenericFunctions';
 import { resourceDescription, resourceOperations } from './ResourceDescription';
 
-export class Odoo implements INodeType {
+export class Flectra implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Odoo',
-		name: 'odoo',
-		icon: 'file:odoo.svg',
+		displayName: 'Flectra',
+		name: 'flectra',
+		icon: 'file:flectra.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'Consume Odoo API',
+		description: 'Consume Flectra API',
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		defaults: {
-			name: 'Odoo',
+			name: 'Flectra',
 		},
 		inputs: ['main'],
 		outputs: ['main'],
 		credentials: [
 			{
-				name: 'odooApi',
+				name: 'flectraApi',
 				required: true,
-				testedBy: 'odooApiTest',
+				testedBy: 'flectraApiTest',
 			},
 		],
 		properties: [...resourceOperations, ...resourceDescription],
@@ -65,14 +65,21 @@ export class Odoo implements INodeType {
 					return [];
 				}
 
-				const credentials = await this.getCredentials('odooApi');
+				const credentials = await this.getCredentials('flectraApi');
 				const url = credentials?.url as string;
 				const username = credentials?.username as string;
 				const password = credentials?.password as string;
-				const db = odooGetDBName(credentials?.db as string, url);
-				const userID = await odooGetUserID.call(this, db, username, password, url);
+				const db = flectraGetDBName(credentials?.db as string, url);
+				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
-				const response = await odooGetModelFields.call(this, db, userID, password, resource, url);
+				const response = await flectraGetModelFields.call(
+					this,
+					db,
+					userID,
+					password,
+					resource,
+					url,
+				);
 
 				const options = Object.entries(response).map(([k, v]) => {
 					const optionField = v as { [key: string]: string };
@@ -87,12 +94,12 @@ export class Odoo implements INodeType {
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0);
 			},
 			async getModels(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const credentials = await this.getCredentials('odooApi');
+				const credentials = await this.getCredentials('flectraApi');
 				const url = credentials?.url as string;
 				const username = credentials?.username as string;
 				const password = credentials?.password as string;
-				const db = odooGetDBName(credentials?.db as string, url);
-				const userID = await odooGetUserID.call(this, db, username, password, url);
+				const db = flectraGetDBName(credentials?.db as string, url);
+				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
 				const body = {
 					jsonrpc: '2.0',
@@ -113,7 +120,7 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
 				const options = response.map((model) => {
 					return {
@@ -125,12 +132,12 @@ export class Odoo implements INodeType {
 				return options as INodePropertyOptions[];
 			},
 			async getStates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const credentials = await this.getCredentials('odooApi');
+				const credentials = await this.getCredentials('flectraApi');
 				const url = credentials?.url as string;
 				const username = credentials?.username as string;
 				const password = credentials?.password as string;
-				const db = odooGetDBName(credentials?.db as string, url);
-				const userID = await odooGetUserID.call(this, db, username, password, url);
+				const db = flectraGetDBName(credentials?.db as string, url);
+				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
 				const body = {
 					jsonrpc: '2.0',
@@ -143,7 +150,7 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
 				const options = response.map((state) => {
 					return {
@@ -154,12 +161,12 @@ export class Odoo implements INodeType {
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
 			},
 			async getCountries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const credentials = await this.getCredentials('odooApi');
+				const credentials = await this.getCredentials('flectraApi');
 				const url = credentials?.url as string;
 				const username = credentials?.username as string;
 				const password = credentials?.password as string;
-				const db = odooGetDBName(credentials?.db as string, url);
-				const userID = await odooGetUserID.call(this, db, username, password, url);
+				const db = flectraGetDBName(credentials?.db as string, url);
+				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
 				const body = {
 					jsonrpc: '2.0',
@@ -172,7 +179,7 @@ export class Odoo implements INodeType {
 					id: Math.floor(Math.random() * 100),
 				};
 
-				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
 				const options = response.map((country) => {
 					return {
@@ -190,14 +197,21 @@ export class Odoo implements INodeType {
 					return [];
 				}
 
-				const credentials = await this.getCredentials('odooApi');
+				const credentials = await this.getCredentials('flectraApi');
 				const url = credentials?.url as string;
 				const username = credentials?.username as string;
 				const password = credentials?.password as string;
-				const db = odooGetDBName(credentials?.db as string, url);
-				const userID = await odooGetUserID.call(this, db, username, password, url);
+				const db = flectraGetDBName(credentials?.db as string, url);
+				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
-				const response = await odooGetActionMethods.call(this, db, userID, password, resource, url);
+				const response = await flectraGetActionMethods.call(
+					this,
+					db,
+					userID,
+					password,
+					resource,
+					url,
+				);
 
 				if (response) {
 					const options = response.map((x) => {
@@ -241,7 +255,7 @@ export class Odoo implements INodeType {
 					},
 				];
 
-				const installed = await odooIsAddonInstalled.call(this);
+				const installed = await flectraIsAddonInstalled.call(this);
 
 				if (installed) {
 					operations.push({
@@ -255,7 +269,7 @@ export class Odoo implements INodeType {
 			},
 		},
 		credentialTest: {
-			async odooApiTest(
+			async flectraApiTest(
 				this: ICredentialTestFunctions,
 				credential: ICredentialsDecrypted,
 			): Promise<INodeCredentialTestResult> {
@@ -269,7 +283,7 @@ export class Odoo implements INodeType {
 							service: 'common',
 							method: 'login',
 							args: [
-								odooGetDBName(credentials?.db as string, credentials?.url as string),
+								flectraGetDBName(credentials?.db as string, credentials?.url as string),
 								credentials?.username,
 								credentials?.password,
 							],
@@ -324,12 +338,12 @@ export class Odoo implements INodeType {
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
-		const credentials = await this.getCredentials('odooApi');
+		const credentials = await this.getCredentials('flectraApi');
 		const url = (credentials?.url as string).replace(/\/$/, '');
 		const username = credentials?.username as string;
 		const password = credentials?.password as string;
-		const db = odooGetDBName(credentials?.db as string, url);
-		const userID = await odooGetUserID.call(this, db, username, password, url);
+		const db = flectraGetDBName(credentials?.db as string, url);
+		const userID = await flectraGetUserID.call(this, db, username, password, url);
 
 		//----------------------------------------------------------------------
 		//                            Main loop
@@ -339,7 +353,7 @@ export class Odoo implements INodeType {
 			try {
 				if (operation === 'create') {
 					const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
-					responseData = await odooCreate.call(
+					responseData = await flectraCreate.call(
 						this,
 						db,
 						userID,
@@ -353,7 +367,7 @@ export class Odoo implements INodeType {
 
 				if (operation === 'delete') {
 					const id = this.getNodeParameter('id', i) as string;
-					responseData = await odooDelete.call(
+					responseData = await flectraDelete.call(
 						this,
 						db,
 						userID,
@@ -369,7 +383,7 @@ export class Odoo implements INodeType {
 					const id = this.getNodeParameter('id', i) as string;
 					const options = this.getNodeParameter('options', i) as IDataObject;
 					const fields = (options.fieldsList as IDataObject[]) || [];
-					responseData = await odooGet.call(
+					responseData = await flectraGet.call(
 						this,
 						db,
 						userID,
@@ -386,9 +400,9 @@ export class Odoo implements INodeType {
 					const returnAll = this.getNodeParameter('returnAll', i) as boolean;
 					const options = this.getNodeParameter('options', i) as IDataObject;
 					const fields = (options.fieldsList as IDataObject[]) || [];
-					const filter = this.getNodeParameter('filterRequest', i) as IOdooFilterOperations;
+					const filter = this.getNodeParameter('filterRequest', i) as IFlectraFilterOperations;
 					if (returnAll) {
-						responseData = await odooGetAll.call(
+						responseData = await flectraGetAll.call(
 							this,
 							db,
 							userID,
@@ -402,7 +416,7 @@ export class Odoo implements INodeType {
 					} else {
 						const offset = this.getNodeParameter('offset', i) as number;
 						const limit = this.getNodeParameter('limit', i) as number;
-						responseData = await odooGetAll.call(
+						responseData = await flectraGetAll.call(
 							this,
 							db,
 							userID,
@@ -421,7 +435,7 @@ export class Odoo implements INodeType {
 				if (operation === 'update') {
 					const id = this.getNodeParameter('id', i) as string;
 					const fields = this.getNodeParameter('fieldsToCreateOrUpdate', i) as IDataObject;
-					responseData = await odooUpdate.call(
+					responseData = await flectraUpdate.call(
 						this,
 						db,
 						userID,
@@ -436,8 +450,9 @@ export class Odoo implements INodeType {
 
 				if (operation === 'workflow') {
 					const id = this.getNodeParameter('id', i) as string;
+					const args = this.getNodeParameter('args', i) as string;
 					const customOperation = this.getNodeParameter('customOperation', i) as string;
-					responseData = await odooWorkflow.call(
+					responseData = await flectraWorkflow.call(
 						this,
 						db,
 						userID,
@@ -446,6 +461,7 @@ export class Odoo implements INodeType {
 						customOperation,
 						url,
 						id,
+						args,
 					);
 				}
 

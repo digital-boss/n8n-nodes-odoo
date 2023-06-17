@@ -9,5 +9,5 @@ cd n8n_install
 npm init
 npm install
 npm install n8n
-npm link @digital-boss/n8n-nodes-odoo
+npm link n8n-nodes-flectra
 npx n8n

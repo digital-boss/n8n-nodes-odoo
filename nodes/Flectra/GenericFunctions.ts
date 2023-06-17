@@ -20,7 +20,7 @@ export const mapOperationToJSONRPC = {
 	delete: 'unlink',
 };
 
-export const mapOdooResources: { [key: string]: string } = {
+export const mapFlectraResources: { [key: string]: string } = {
 	contact: 'res.partner',
 	opportunity: 'crm.lead',
 	note: 'note.note',
@@ -51,7 +51,7 @@ type FilterOperation =
 	| 'notIn'
 	| 'childOf';
 
-export interface IOdooFilterOperations {
+export interface IFlectraFilterOperations {
 	filter: Array<{
 		fieldName: string;
 		operator: string;
@@ -59,31 +59,31 @@ export interface IOdooFilterOperations {
 	}>;
 }
 
-export interface IOdooNameValueFields {
+export interface IFlectraNameValueFields {
 	fields: Array<{
 		fieldName: string;
 		fieldValue: string;
 	}>;
 }
 
-export interface IOdooResponseFields {
+export interface IFlectraResponseFields {
 	fields: Array<{
 		field: string;
 		fromList?: boolean;
 	}>;
 }
 
-type OdooCRUD = 'create' | 'update' | 'delete' | 'get' | 'getAll';
+type FlectraCRUD = 'create' | 'update' | 'delete' | 'get' | 'getAll';
 
-export function odooGetDBName(databaseName: string | undefined, url: string) {
+export function flectraGetDBName(databaseName: string | undefined, url: string) {
 	if (databaseName) return databaseName;
-	const odooURL = new URL(url);
-	const hostname = odooURL.hostname;
+	const flectraURL = new URL(url);
+	const hostname = flectraURL.hostname;
 	if (!hostname) return '';
-	return odooURL.hostname.split('.')[0];
+	return flectraURL.hostname.split('.')[0];
 }
 
-function processFilters(value: IOdooFilterOperations) {
+function processFilters(value: IFlectraFilterOperations) {
 	return value.filter?.map((item) => {
 		const operator = item.operator as FilterOperation;
 		item.operator = mapFilterOperationToJSONRPC[operator];
@@ -92,18 +92,18 @@ function processFilters(value: IOdooFilterOperations) {
 }
 
 export function processNameValueFields(value: IDataObject) {
-	const data = value as unknown as IOdooNameValueFields;
+	const data = value as unknown as IFlectraNameValueFields;
 	return data?.fields?.reduce((acc, record) => {
 		return Object.assign(acc, { [record.fieldName]: record.fieldValue });
 	}, {});
 }
 
 // function processResponseFields(value: IDataObject) {
-// 	const data = value as unknown as IOdooResponseFields;
+// 	const data = value as unknown as IFlectraResponseFields;
 // 	return data?.fields?.map((entry) => entry.field);
 // }
 
-export async function odooJSONRPCRequest(
+export async function flectraJSONRPCRequest(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	body: IDataObject,
 	url: string,
@@ -134,7 +134,7 @@ export async function odooJSONRPCRequest(
 	}
 }
 
-export async function odooGetModelFields(
+export async function flectraGetModelFields(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
@@ -153,7 +153,7 @@ export async function odooGetModelFields(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					'fields_get',
 					[],
 					['string', 'type', 'help', 'required', 'name'],
@@ -162,23 +162,23 @@ export async function odooGetModelFields(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooIsAddonInstalled(
+export async function flectraIsAddonInstalled(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 ): Promise<boolean> {
 	try {
-		const credentials = await this.getCredentials('odooApi');
+		const credentials = await this.getCredentials('flectraApi');
 		const url = credentials?.url as string;
 		const username = credentials?.username as string;
 		const password = credentials?.password as string;
-		const db = odooGetDBName(credentials?.db as string, url);
-		const userID = await odooGetUserID.call(this, db, username, password, url);
+		const db = flectraGetDBName(credentials?.db as string, url);
+		const userID = await flectraGetUserID.call(this, db, username, password, url);
 
 		const body = {
 			jsonrpc: '2.0',
@@ -191,7 +191,7 @@ export async function odooIsAddonInstalled(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+		const result = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 		if (result?.length === 1 && result[0].hasOwnProperty('methods')) {
 			return true;
 		} else {
@@ -202,7 +202,7 @@ export async function odooIsAddonInstalled(
 	}
 }
 
-export async function odooGetActionMethods(
+export async function flectraGetActionMethods(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
@@ -230,7 +230,7 @@ export async function odooGetActionMethods(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
+		const result = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 		if (result?.length === 1 && result[0].hasOwnProperty('methods')) {
 			const methods = result[0]['methods'];
 			return methods as string[];
@@ -242,13 +242,13 @@ export async function odooGetActionMethods(
 	}
 }
 
-export async function odooCreate(
+export async function flectraCreate(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
-	operation: OdooCRUD,
+	operation: FlectraCRUD,
 	url: string,
 	newItem: IDataObject,
 ) {
@@ -263,7 +263,7 @@ export async function odooCreate(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					newItem || {},
 				],
@@ -271,20 +271,20 @@ export async function odooCreate(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return { id: result };
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooGet(
+export async function flectraGet(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
-	operation: OdooCRUD,
+	operation: FlectraCRUD,
 	url: string,
 	itemsID: string,
 	fieldsToReturn?: IDataObject[],
@@ -306,7 +306,7 @@ export async function odooGet(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					[+itemsID] || [],
 					fieldsToReturn || [],
@@ -315,22 +315,22 @@ export async function odooGet(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooGetAll(
+export async function flectraGetAll(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
-	operation: OdooCRUD,
+	operation: FlectraCRUD,
 	url: string,
-	filters?: IOdooFilterOperations,
+	filters?: IFlectraFilterOperations,
 	fieldsToReturn?: IDataObject[],
 	offset = 0,
 	limit = 0,
@@ -346,7 +346,7 @@ export async function odooGetAll(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					(filters && processFilters(filters)) || [],
 					fieldsToReturn || [],
@@ -357,20 +357,20 @@ export async function odooGetAll(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooUpdate(
+export async function flectraUpdate(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
-	operation: OdooCRUD,
+	operation: FlectraCRUD,
 	url: string,
 	itemsID: string,
 	fieldsToUpdate: IDataObject,
@@ -398,7 +398,7 @@ export async function odooUpdate(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					[+itemsID] || [],
 					fieldsToUpdate,
@@ -407,14 +407,14 @@ export async function odooUpdate(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		await odooJSONRPCRequest.call(this, body, url);
+		await flectraJSONRPCRequest.call(this, body, url);
 		return { id: itemsID };
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooWorkflow(
+export async function flectraWorkflow(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
@@ -423,6 +423,7 @@ export async function odooWorkflow(
 	customOperation: string,
 	url: string,
 	itemsID: string,
+	arg: string,
 ) {
 	try {
 		if (!/^\d+$/.test(itemsID) || !parseInt(itemsID, 10)) {
@@ -431,31 +432,32 @@ export async function odooWorkflow(
 				message: `Please specify a valid ID: ${itemsID}`,
 			});
 		}
+		arg = JSON.parse(arg);
 		const body = {
 			jsonrpc: '2.0',
 			method: 'call',
 			params: {
 				service: 'object',
-				method: 'execute',
-				args: [db, userID, password, resource, customOperation, [+itemsID] || []],
+				method: 'execute_kw',
+				args: [db, userID, password, resource, customOperation, [[+itemsID] || []], arg],
 			},
 			id: Math.floor(Math.random() * 100),
 		};
 
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooDelete(
+export async function flectraDelete(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	userID: number,
 	password: string,
 	resource: string,
-	operation: OdooCRUD,
+	operation: FlectraCRUD,
 	url: string,
 	itemsID: string,
 ) {
@@ -476,7 +478,7 @@ export async function odooDelete(
 					db,
 					userID,
 					password,
-					mapOdooResources[resource] || resource,
+					mapFlectraResources[resource] || resource,
 					mapOperationToJSONRPC[operation],
 					[+itemsID] || [],
 				],
@@ -484,14 +486,14 @@ export async function odooDelete(
 			id: Math.floor(Math.random() * 100),
 		};
 
-		await odooJSONRPCRequest.call(this, body, url);
+		await flectraJSONRPCRequest.call(this, body, url);
 		return { success: true };
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooGetUserID(
+export async function flectraGetUserID(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	db: string,
 	username: string,
@@ -509,14 +511,14 @@ export async function odooGetUserID(
 			},
 			id: Math.floor(Math.random() * 100),
 		};
-		const loginResult = await odooJSONRPCRequest.call(this, body, url);
+		const loginResult = await flectraJSONRPCRequest.call(this, body, url);
 		return loginResult as unknown as number;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
-export async function odooGetServerVersion(
+export async function flectraGetServerVersion(
 	this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions,
 	url: string,
 ) {
@@ -531,7 +533,7 @@ export async function odooGetServerVersion(
 			},
 			id: Math.floor(Math.random() * 100),
 		};
-		const result = await odooJSONRPCRequest.call(this, body, url);
+		const result = await flectraJSONRPCRequest.call(this, body, url);
 		return result;
 	} catch (error) {
 		throw new NodeApiError(this.getNode(), error as JsonObject);

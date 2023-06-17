@@ -339,4 +339,16 @@ export const resourceDescription: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Arguments',
+		name: 'args',
+		type: 'string',
+		description: 'Add. Arguments (i.e {"attachment_ids": [158], "context": {"default_journal_id": 2}} ).',
+		default: '{}',
+		displayOptions: {
+			show: {
+				operation: ['workflow'],
+			},
+		},
+	},
 ];

@@ -1,9 +1,8 @@
 import { ICredentialType, INodeProperties } from 'n8n-workflow';
 
-export class OdooApi implements ICredentialType {
-	name = 'odooApi';
-	displayName = 'Odoo API';
-	// documentationUrl = 'odoo';
+export class FlectraApi implements ICredentialType {
+	name = 'flectraApi';
+	displayName = 'Flectra API';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Site URL',
