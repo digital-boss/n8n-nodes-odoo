@@ -23,19 +23,16 @@
 	"scripts": {
 		"build": "tsc && gulp build:icons",
 		"dev": "tsc --watch",
-		"format": "prettier nodes credentials --write",
-		"lint": "eslint nodes credentials package.json",
-		"lintfix": "eslint nodes credentials package.json --fix",
-		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+		"format": "prettier nodes --write",
+		"lint": "eslint nodes package.json",
+		"lintfix": "eslint nodes package.json --fix",
+		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes package.json"
 	},
 	"files": [
 		"dist"
 	],
 	"n8n": {
 		"n8nNodesApiVersion": 1,
-		"credentials": [
-			"dist/credentials/OdooApi.credentials.js"
-		],
 		"nodes": [
 			"dist/nodes/Odoo/Odoo.node.js"
 		]

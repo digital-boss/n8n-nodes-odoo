@@ -254,65 +254,6 @@ export class Odoo implements INodeType {
 				return operations;
 			},
 		},
-		credentialTest: {
-			async odooApiTest(
-				this: ICredentialTestFunctions,
-				credential: ICredentialsDecrypted,
-			): Promise<INodeCredentialTestResult> {
-				const credentials = credential.data;
-
-				try {
-					const body = {
-						jsonrpc: '2.0',
-						method: 'call',
-						params: {
-							service: 'common',
-							method: 'login',
-							args: [
-								odooGetDBName(credentials?.db as string, credentials?.url as string),
-								credentials?.username,
-								credentials?.password,
-							],
-						},
-						id: Math.floor(Math.random() * 100),
-					};
-
-					const options: OptionsWithUri = {
-						headers: {
-							'User-Agent': 'n8n',
-							Connection: 'keep-alive',
-							Accept: '*/*',
-							'Content-Type': 'application/json',
-						},
-						method: 'POST',
-						body,
-						uri: `${(credentials?.url as string).replace(/\/$/, '')}/jsonrpc`,
-						json: true,
-					};
-					const result = await this.helpers.request!(options);
-					if (result.error || !result.result) {
-						return {
-							status: 'Error',
-							message: `Credentials are not valid`,
-						};
-					} else if (result.error) {
-						return {
-							status: 'Error',
-							message: `Credentials are not valid: ${result.error.data.message}`,
-						};
-					}
-				} catch (error) {
-					return {
-						status: 'Error',
-						message: `Settings are not valid: ${error}`,
-					};
-				}
-				return {
-					status: 'OK',
-					message: 'Authentication successful!',
-				};
-			},
-		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
