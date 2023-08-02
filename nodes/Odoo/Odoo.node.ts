@@ -111,13 +111,11 @@ export class Odoo implements INodeType {
 
 				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((model) => {
-					return {
-						name: model.name,
-						value: model.model,
-						description: `model: ${model.model}<br> modules: ${model.modules}`,
-					};
-				});
+				const options = response.map((model) => ({
+					name: model.name,
+					value: model.model,
+					description: `model: ${model.model}<br> modules: ${model.modules}`,
+				}));
 				return options as INodePropertyOptions[];
 			},
 			async getStates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -141,12 +139,10 @@ export class Odoo implements INodeType {
 
 				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((state) => {
-					return {
-						name: state.name as string,
-						value: state.id,
-					};
-				});
+				const options = response.map((state) => ({
+					name: state.name as string,
+					value: state.id,
+				}));
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
 			},
 			async getCountries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -170,12 +166,10 @@ export class Odoo implements INodeType {
 
 				const response = (await odooJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((country) => {
-					return {
-						name: country.name as string,
-						value: country.id,
-					};
-				});
+				const options = response.map((country) => ({
+					name: country.name as string,
+					value: country.id,
+				}));
 
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
 			},
@@ -196,12 +190,10 @@ export class Odoo implements INodeType {
 				const response = await odooGetActionMethods.call(this, db, userID, password, resource, url);
 
 				if (response) {
-					const options = response.map((x) => {
-						return {
-							name: x,
-							value: x,
-						};
-					});
+					const options = response.map((x) => ({
+						name: x,
+						value: x,
+					}));
 
 					return options;
 				} else {
