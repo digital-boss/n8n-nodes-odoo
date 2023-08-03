@@ -114,7 +114,8 @@ export class Odoo implements INodeType {
 				const options = response.map((model) => ({
 					name: model.name,
 					value: model.model,
-					description: `model: ${model.model}<br> modules: ${model.modules}`,
+					// eslint-disable-next-line n8n-nodes-base/node-param-description-line-break-html-tag
+					description: `Model: ${model.model}<br> Modules: ${model.modules}`,
 				}));
 				return options as INodePropertyOptions[];
 			},
