@@ -1,12 +1,8 @@
 import { IExecuteFunctions } from 'n8n-core';
-import { OptionsWithUri } from 'request';
 
 import {
-	ICredentialsDecrypted,
-	ICredentialTestFunctions,
 	IDataObject,
 	ILoadOptionsFunctions,
-	INodeCredentialTestResult,
 	INodeExecutionData,
 	INodePropertyOptions,
 	INodeType,
@@ -72,14 +68,7 @@ export class Flectra implements INodeType {
 				const db = flectraGetDBName(credentials?.db as string, url);
 				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
-				const response = await flectraGetModelFields.call(
-					this,
-					db,
-					userID,
-					password,
-					resource,
-					url,
-				);
+				const response = await flectraGetModelFields.call(this, db, userID, password, resource, url);
 
 				const options = Object.entries(response).map(([k, v]) => {
 					const optionField = v as { [key: string]: string };
@@ -122,13 +111,12 @@ export class Flectra implements INodeType {
 
 				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((model) => {
-					return {
+				const options = response.map((model) => ({
 						name: model.name,
 						value: model.model,
-						description: `model: ${model.model}<br> modules: ${model.modules}`,
-					};
-				});
+					// eslint-disable-next-line n8n-nodes-base/node-param-description-line-break-html-tag
+					description: `Model: ${model.model}<br> Modules: ${model.modules}`,
+				}));
 				return options as INodePropertyOptions[];
 			},
 			async getStates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -152,12 +140,10 @@ export class Flectra implements INodeType {
 
 				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((state) => {
-					return {
+				const options = response.map((state) => ({
 						name: state.name as string,
 						value: state.id,
-					};
-				});
+				}));
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
 			},
 			async getCountries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -181,12 +167,10 @@ export class Flectra implements INodeType {
 
 				const response = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 
-				const options = response.map((country) => {
-					return {
+				const options = response.map((country) => ({
 						name: country.name as string,
 						value: country.id,
-					};
-				});
+				}));
 
 				return options.sort((a, b) => a.name?.localeCompare(b.name) || 0) as INodePropertyOptions[];
 			},
@@ -204,22 +188,13 @@ export class Flectra implements INodeType {
 				const db = flectraGetDBName(credentials?.db as string, url);
 				const userID = await flectraGetUserID.call(this, db, username, password, url);
 
-				const response = await flectraGetActionMethods.call(
-					this,
-					db,
-					userID,
-					password,
-					resource,
-					url,
-				);
+				const response = await flectraGetActionMethods.call(this, db, userID, password, resource, url);
 
 				if (response) {
-					const options = response.map((x) => {
-						return {
+					const options = response.map((x) => ({
 							name: x,
 							value: x,
-						};
-					});
+					}));
 
 					return options;
 				} else {
@@ -266,65 +241,6 @@ export class Flectra implements INodeType {
 				}
 
 				return operations;
-			},
-		},
-		credentialTest: {
-			async flectraApiTest(
-				this: ICredentialTestFunctions,
-				credential: ICredentialsDecrypted,
-			): Promise<INodeCredentialTestResult> {
-				const credentials = credential.data;
-
-				try {
-					const body = {
-						jsonrpc: '2.0',
-						method: 'call',
-						params: {
-							service: 'common',
-							method: 'login',
-							args: [
-								flectraGetDBName(credentials?.db as string, credentials?.url as string),
-								credentials?.username,
-								credentials?.password,
-							],
-						},
-						id: Math.floor(Math.random() * 100),
-					};
-
-					const options: OptionsWithUri = {
-						headers: {
-							'User-Agent': 'n8n',
-							Connection: 'keep-alive',
-							Accept: '*/*',
-							'Content-Type': 'application/json',
-						},
-						method: 'POST',
-						body,
-						uri: `${(credentials?.url as string).replace(/\/$/, '')}/jsonrpc`,
-						json: true,
-					};
-					const result = await this.helpers.request!(options);
-					if (result.error || !result.result) {
-						return {
-							status: 'Error',
-							message: `Credentials are not valid`,
-						};
-					} else if (result.error) {
-						return {
-							status: 'Error',
-							message: `Credentials are not valid: ${result.error.data.message}`,
-						};
-					}
-				} catch (error) {
-					return {
-						status: 'Error',
-						message: `Settings are not valid: ${error}`,
-					};
-				}
-				return {
-					status: 'OK',
-					message: 'Authentication successful!',
-				};
 			},
 		},
 	};
@@ -450,7 +366,6 @@ export class Flectra implements INodeType {
 
 				if (operation === 'workflow') {
 					const id = this.getNodeParameter('id', i) as string;
-					const args = this.getNodeParameter('args', i) as string;
 					const customOperation = this.getNodeParameter('customOperation', i) as string;
 					responseData = await flectraWorkflow.call(
 						this,
@@ -461,7 +376,6 @@ export class Flectra implements INodeType {
 						customOperation,
 						url,
 						id,
-						args,
 					);
 				}
 

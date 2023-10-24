@@ -232,8 +232,8 @@ export async function flectraGetActionMethods(
 
 		const result = (await flectraJSONRPCRequest.call(this, body, url)) as IDataObject[];
 		if (result?.length === 1 && result[0].hasOwnProperty('methods')) {
-			const methods = result[0]['methods'];
-			return methods as string[];
+			const methods = JSON.parse(result[0].methods as string) as string[];
+			return methods;
 		} else {
 			return undefined;
 		}
